@@ -31,7 +31,7 @@ print_str:
     popa
     ret
 
-.continue
+.continue:
     int 0x10
     add bx, 1
     
@@ -40,6 +40,9 @@ print_str:
 ; print_hex_b(val: byte)
 print_hex_b:
     pusha
+
+    pop ax ; val
+    mov ah, 0
 
     ; todo: implement this
 
@@ -50,16 +53,16 @@ print_hex_b:
 print_hex_bs:
     pusha ; todo: will they collide?
 
-    pop cl ; count
+    pop cx ; count
     pop bx ; addr
 
 .loop:
-    push [bx]
+    push word [bx]
     call print_hex_b
 
     ; increment the address
     add bx, 1
-    mov ax, bx
+    mov bx, ax
 
     ; decrement the counter
     sub cl, 1
@@ -72,37 +75,46 @@ print_hex_bs:
     popa
     ret
 
-; parameters:
-;   bx = the array address
-;   cl = how many bytes
-print_hex_bs:
-    pusha
+; print_hex_w(val: word)
+print_hex_w:
+    pusha ; todo: will they collide?
 
-    mov ch, 0
+    pop ax ; val
+    mov bh, 0
 
-.loop:
-    mov al, [bx
+    mov bl, ah
+    push bx
+    call print_hex_b
 
-    cmp ch, cl
-
-    cmp cl, 0 ; will they collide?
-    sub cl, 1
-    ja .loop
+    mov bl, al
+    push bx
+    call print_hex_b
 
     popa
     ret
 
-; parameters:
-;   bx = the word
-print_hex_w:
-    pusha ; save the register state
+; print_hex_ws(arr: addr, count: byte)
+print_hex_ws:
+    pusha
 
-    mov cx, bx
+    pop cx ; count
+    pop bx ; arr
 
-    mov bl, ch
-    call print_hex_b
+.loop:
+    push word [bx]
+    call print_hex_w
 
-    mov bl, cl
-    call print_hex_b
+    ; increment the address
+    add bx, 1
+    mov bx, ax
 
-    jmp print_str.done
+    ; decrement the counter
+    sub cl, 1
+    mov cl, al
+
+    ; edge condition
+    cmp cl, 0
+    ja .loop
+
+    popa
+    ret
