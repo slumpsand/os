@@ -5,8 +5,6 @@ print_str:
     pop dword [.str_addr]
     pusha
 
-    add dword [.str_addr], 2 ; todo: why do I need to do this?
-
     mov ah, 0x0E
 
 .loop:

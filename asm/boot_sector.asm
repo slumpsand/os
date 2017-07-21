@@ -12,5 +12,5 @@ mystring:
 
 %include "print.asm"
 
-    times 510-($-$$) db 0 ; write everything with zeroes except the last two bytes
+    times 510-($-$$) db 0
     dw 0xAA55
