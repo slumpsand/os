@@ -20,8 +20,8 @@ B=`tput sgr0`
 
 # some computed variables
 INFILE="asm/$FILENAME.asm"
-ELFFILE="out/$FILENAME.elf"
 BINFILE="out/$FILENAME.bin"
+ELFFILE="out/$FILENAME.elf"
 
 echo "$A(01) building '$INFILE' ('$ELFFILE') ...$B"
 nasm -f elf -F dwarf "$INFILE" -I asm/ -o "$ELFFILE"
