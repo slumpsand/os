@@ -1,14 +1,24 @@
 [org 0x7C00]
 
-    mov bx, mystring
-    push bx
+    mov bx, HELLO
+    call print
+    call print_nl
 
-    call print_str
+    mov bx, GOODBYE
+    call print
+    call print_nl
+
+    mov dx, 0x12FE
+    call print_hex
+    call print_nl
 
     jmp $ ; $ = current address
 
-mystring:
+HELLO:
     db "Hello, World!", 0
+
+GOODBYE:
+    db "And bye ...", 0
 
 %include "print.asm"
 
