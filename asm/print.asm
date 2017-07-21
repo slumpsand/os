@@ -1,5 +1,3 @@
-[org 0x7C00]
-
 ; print_str(str: addr)
 print_str:
     pop dword [.str_addr]
@@ -19,7 +17,7 @@ print_str:
 
     jmp .loop
 
-.str_addr: resw 2
+.str_addr: dw 0, 0
 
 .done:
     popa
