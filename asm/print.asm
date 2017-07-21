@@ -2,26 +2,27 @@
 
 ; print_str(str: addr)
 print_str:
-    pop word [.str]
+    pop dword [.str_addr]
     pusha
 
+    add dword [.str_addr], 2 ; todo: why do I need to do this?
+
+    mov ah, 0x0E
+
 .loop:
-    mov bx, [.str]
+    mov bx, [.str_addr]
     mov al, [bx]
 
     cmp al, 0
-    je .end
+    je .done
 
-    mov ah, 0x0E
     int 0x10
-
-    inc word [.str]
+    inc dword [.str_addr]
 
     jmp .loop
 
-.end:
+.str_addr: resw 2
+
+.done:
     popa
     ret
-
-.str:
-    dw 0
