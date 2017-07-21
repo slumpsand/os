@@ -4,7 +4,7 @@ set -e
 QEMU="${QEMU:-qemu-system-x86_64}"
 NASM="${NASM:-nasm}"
 
-FILE="${1:-boot_sector}"
+FILE="${1:-main}"
 
 A=`tput setaf 3 && tput bold`
 B=`tput sgr0`
