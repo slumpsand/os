@@ -29,6 +29,8 @@ print_nl:
     ret
 
 print_hex:
+    pusha
+
     mov cx, 0
 
 .loop:

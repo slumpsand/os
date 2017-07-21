@@ -1,26 +1,34 @@
 [org 0x7C00]
 
-    mov bx, HELLO
-    call print
-    call print_nl
+    mov bp, 8000h ; move the stack
+    mov sp, bp
 
-    mov bx, GOODBYE
-    call print
-    call print_nl
+    mov bx, 9000h
+    mov dh, 2
 
-    mov dx, 0x12FE
+    call disk_load
+
+    mov dx, [9000h]
     call print_hex
     call print_nl
 
-    jmp $ ; $ = current address
+    mov dx, [9000h + 512]
+    call print_hex
 
-HELLO:
-    db "Hello, World!", 0
-
-GOODBYE:
-    db "And bye ...", 0
+    jmp $ ; loop forever
 
 %include "print.asm"
+%include "disk.asm"
 
+HELLO:
+  db "Hello!", 0
+
+    ; magic number
     times 510-($-$$) db 0
     dw 0xAA55
+
+    ; sector two
+    times 256 dw 0xDADA
+    
+    ; sector three
+    times 256 dw 0xFACE
