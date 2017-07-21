@@ -1,33 +1,19 @@
 #!/bin/bash
 set -e
 
-# aliases
-alias qemu="${QEMU:-qemu-system-x86_64}"
-alias gdb="${GDB:-gdb}"
-alias nasm="${NASM:-nasm}"
-alias objcopy="${OBJCOPY:-objcopy}"
+QEMU="${QEMU:-qemu-system-x86_64}"
+NASM="${NASM:-nasm}"
 
-# command line arguments
-FILENAME="${1:-boot_sector}"
-DEBUG="${2:-TRUE}"
+FILE="${1:-boot_sector}"
 
-# settings
-QEMU_FLAGS="-S -s" # todo: second -s required?
-
-# some helper variables
 A=`tput setaf 3 && tput bold`
 B=`tput sgr0`
 
-# some computed variables
-INFILE="asm/$FILENAME.asm"
-BINFILE="out/$FILENAME.bin"
-ELFFILE="out/$FILENAME.elf"
+INFILE="asm/$FILE.asm"
+OUTFILE="out/$FILE.bin"
 
-echo "$A(01) building '$INFILE' ('$ELFFILE') ...$B"
-nasm -f elf -F dwarf "$INFILE" -I asm/ -o "$ELFFILE"
+echo "$A(01) building '$INFILE' ('$OUTFILE') ...$B"
+$NASM -f bin "$INFILE" -Iasm/ -o "$OUTFILE"
 
-echo "$A(02) extracting binary '$BINFILE' ...$B"
-objcopy -O binary "$ELFFILE" "$BINFILE"
-
-echo "$A(03) running gdb / qemu ...$B"
-gdb -x scripts/debug.gdb
+echo "$A(02) running '$OUTFILE' ...$B"
+$QEMU -drive "format=raw,file=$OUTFILE"
