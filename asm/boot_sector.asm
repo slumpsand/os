@@ -1,10 +1,9 @@
 [org 0x7C00]
 
-    mov ah, 0x0E ; enter tty mode
-
     mov bx, mystring
+    push bx
+
     call print_str
-    call print_nl
 
     jmp $ ; $ = current address
 
