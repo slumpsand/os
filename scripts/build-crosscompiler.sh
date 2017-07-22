@@ -25,27 +25,32 @@ cd "$BUILDDIR"
 mkdir {log,gcc-build,binutils-build}
 
 echo "$A(02) downloading sources ...$B"
-wget -O "https://ftp.gnu.org/gnu/$BINUTILS_DIR.tar.gz"
-wget -O "https://ftp.gnu.org/gnu/gcc/$GCC_DIR/$GCC_DIR.tar.gz"
+
+#curl -O "https://ftp.gnu.org/gnu/binutils/$BINUTILS_DIR.tar.gz"               # uncomment this in the final version
+#curl -O "https://ftp.gnu.org/gnu/gcc/$GCC_DIR/$GCC_DIR.tar.gz"
 
 echo "$A(03) extracting sources ...$B"
-tar -xf "$BINUTILS_DIR.tar.gz"
-tar -xf "$GCC_DIR.tar.gz"
+#tar -xf "$BINUTILS_DIR.tar.gz"                                                 # todo: use the correct ones
+#tar -xf "$GCC_DIR.tar.gz"
+tar -xf "/tmp/sources-gcc/$BINUTILS_DIR.tar.gz" -C .
+tar -xf "/tmp/sources-gcc/$GCC_DIR.tar.gz" -C .
 
 echo "$A(04) configuring binutils ...$B"
 cd "$BUILDDIR/binutils-build"
 "../$BINUTILS_DIR/configure" --target="$TARGET" --enable-interwork --enable-multilib \
 	--disable-nls --disable-werror --prefix="$PREFIX" \
-	2>&1 | tee ../log/binutils-configure.log && (exit ${PIPE_STATUS[0]})
+	2>&1 | tee ../log/binutils-configure.log
+test "${PIPE_STATUS[0]}" = "0" || exit 1
 
 echo "$A(05) building / installing binutils ...$B"
-make all install 2>&1 | tee ../log/binutils-install.log && (exit ${PIPE_STATUS[0]})
+make all install 2>&1 | tee ../log/binutils-install.log
 
 echo "$A(06) configuring gcc ...$B"
 cd "$BUILDDIR/gcc-build"
-"../GCC_DIR/configure" --target="$TARGET" --prefix="$PREFIX" --disable-nls --disable-libssp \
+"../$GCC_DIR/configure" --target="$TARGET" --prefix="$PREFIX" --disable-nls --disable-libssp \
 	--enable-languages=c --without-headers \
-	2>&1 | tee ../log/gcc-configure.log && (exit ${PIPE_STATUS[0]})
+	2>&1 | tee ../log/gcc-configure.log
+test "${PIPE_STATUS[0]}" = "0" || exit 1
 
 echo "$A(07) building gcc ...$B"
 make all-gcc
