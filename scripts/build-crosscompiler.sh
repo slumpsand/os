@@ -40,7 +40,7 @@ cd "$BUILDDIR/binutils-build"
 "../$BINUTILS_DIR/configure" --target="$TARGET" --enable-interwork --enable-multilib \
 	--disable-nls --disable-werror --prefix="$PREFIX" \
 	2>&1 | tee ../log/binutils-configure.log
-test "${PIPE_STATUS[0]}" = "0" || exit 1
+test "${PIPESTATUS[0]}" = "0" || exit 1
 
 echo "$A(05) building / installing binutils ...$B"
 make all install 2>&1 | tee ../log/binutils-install.log
@@ -50,7 +50,7 @@ cd "$BUILDDIR/gcc-build"
 "../$GCC_DIR/configure" --target="$TARGET" --prefix="$PREFIX" --disable-nls --disable-libssp \
 	--enable-languages=c --without-headers \
 	2>&1 | tee ../log/gcc-configure.log
-test "${PIPE_STATUS[0]}" = "0" || exit 1
+test "${PIPESTATUS[0]}" = "0" || exit 1
 
 echo "$A(07) building gcc ...$B"
 make all-gcc
