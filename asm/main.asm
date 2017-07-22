@@ -1,15 +1,17 @@
-[org 0x7C00]
+[org 0x7C00]                              ; bootloader offset
+
     mov bp, 9000h                         ; set the stack
     mov sp, bp
 
-    call switch_pm                        ; will never return
+    jmp switch_pm                        ; will never return
+                                          ; todo: make this a jump
 
 %include "print.asm"
 %include "gdt.asm"
 %include "switch.asm"
 
 [bits 32]                                 ; will be executed in 32bit,
-start:                                    ; protected mode
+ENTER:                                    ; protected mode
     mov ebx, MSG_PROT_MODE
     call print
     jmp $

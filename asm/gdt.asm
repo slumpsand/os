@@ -1,9 +1,9 @@
 gdt_start:
-    dd 0             ; the GDT starts with a null-byte
+    dd 0             ; the GDT starts 8 null bytes
     dd 0
 
 gdt_code:
-    dw 0xFFFF         ; segment length (bits 0-15)
+    dw 0xFFFF        ; segment length (bits 0-15)
 
     dw 0             ; segment base (bits 0-15)
     db 0             ; segment base (bits 16-23)

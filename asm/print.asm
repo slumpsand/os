@@ -1,6 +1,6 @@
 [bits 32]              ; 32-bit protected mode
 
-VIDEO     equ 0xB800   ; where the video memory is located
+VIDEO     equ 0xB8000  ; where the video memory is located
 W_ON_B    equ 0x0F     ; white text on black background
 
 ; eax = string address
