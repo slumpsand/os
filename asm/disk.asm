@@ -1,3 +1,5 @@
+[bits 16]
+
 disk_load:                              ; load DH sectors from drive DL into ES:BX
     pusha
     push dx
@@ -19,21 +21,21 @@ disk_load:                              ; load DH sectors from drive DL into ES:
     ret
 
 .disk_error:
-;    mov bx, .DISK_ERROR
-;    call print
-;    call print_nl
+    mov bx, .DISK_ERROR
+    call print
+    call print_nl
 
-;    mov dh, ah
-;    call print_hex
+    mov dh, ah
+    call print_hex
 
     jmp .disk_loop
 
-; .sector_error:
-;    mov bx, .SECTOR_ERROR
-;    call print
+.sector_error:
+    mov bx, .SECTOR_ERROR
+    call print
 
 .disk_loop:
     jmp $
 
-; .DISK_ERROR:       db "Can't read from disk.", 0
-; .SECTOR_ERROR:     db "Incorrect number of sectors.", 0
+.DISK_ERROR:       db "Can't read from disk.", 0
+.SECTOR_ERROR:     db "Incorrect number of sectors.", 0
