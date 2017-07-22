@@ -3,12 +3,10 @@
     mov bp, 9000h                         ; set the stack
     mov sp, bp
 
-    jmp switch_pm                        ; will never return
-                                          ; todo: make this a jump
+    jmp switch_pm                         ; will never return
 
 %include "print.asm"
-%include "gdt.asm"
-%include "switch.asm"
+%include "enter.asm"
 
 [bits 32]                                 ; will be executed in 32bit,
 ENTER:                                    ; protected mode
