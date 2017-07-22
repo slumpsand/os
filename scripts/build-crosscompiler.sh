@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# WARNING: this script doesn't work, TODO:
+# download mpc, mpfr, gmp and add them ...
+
 # this script is build to run on a 64-bit environment (but create
 # 32-bit executables). The package 'gcc-multilib' is therefor required
 
