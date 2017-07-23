@@ -4,6 +4,7 @@ CC   := i386-elf-gcc
 LD   := i386-elf-ld
 NASM := nasm
 QEMU := qemu-system-x86_64
+MAKE := make
 
 A := $(shell tput setaf 3 && tput bold)
 B := $(shell tput sgr0)
@@ -14,7 +15,7 @@ AFILES := asm/boot.asm asm/disk.asm asm/enter.asm asm/print.asm
 
 KERNEL_OFFSET := 0x1000
 
-CFLAGS += -ffreestanding -Iinclude/
+CFLAGS += -ffreestanding -funsigned-char -Iinclude/
 AFLAGS += -Iasm/
 LFLAGS += 
 
@@ -27,6 +28,11 @@ run: build
 
 create_dir:
 	test -d out || mkdir out
+
+build_cross:
+	$(eval BUILD_FOLDER := $(shell mktemp -d -t build.XXXXXXXXXX))
+	cp cross.mk $(BUILD_FOLDER)/
+	cd $(BUILD_FOLDER) && make -f cross.mk
 
 out/%.o: src/%.c $(HFILES)
 	@echo "$(A)compiling the file '$<' ...$(B)"
@@ -48,4 +54,4 @@ out/os.bin: out/boot.bin out/kernel.bin
 	@echo "$(A)putting both binaries together ...$(B)"
 	cat $^ > $@
 
-.PHONY: build create_dir
+.PHONY: build create_dir build_cross
