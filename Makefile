@@ -9,7 +9,7 @@ LD   := i386-elf-ld
 GDB  := i386-elf-gdb
 OBJ  := i386-elf-objcopy
 NASM := nasm
-QEMU := qemu-system-x86_64
+QEMU := qemu-system-i386
 MAKE := make
 
 # --- NASM FILES
