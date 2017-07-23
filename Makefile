@@ -22,6 +22,7 @@ build: | create_dir out/os.bin
 	@echo "$(A)build complete ...$(B)"
 
 run: build
+	@echo "$(A)running emulator ...$(B)"
 	$(QEMU) -drive "format=raw,file=out/os.bin"
 
 create_dir:
