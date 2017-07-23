@@ -8,13 +8,13 @@ QEMU := qemu-system-x86_64
 A := $(shell tput setaf 3 && tput bold)
 B := $(shell tput sgr0)
 
-HFILES := 
-OFILES := out/kernel.o
+HFILES := include/print.h
+OFILES := out/kernel.o out/print.o
 AFILES := asm/boot.asm asm/disk.asm asm/enter.asm asm/print.asm
 
 KERNEL_OFFSET := 0x1000
 
-CFLAGS += -ffreestanding
+CFLAGS += -ffreestanding -Iinclude/
 AFLAGS += -Iasm/
 LFLAGS += 
 

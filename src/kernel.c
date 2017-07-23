@@ -1,6 +1,7 @@
-#define VIDEO_MEMORY 0xb8000
+#include <print.h>
 
 void main() {
-   char* pos = (char*) VIDEO_MEMORY;
-   *pos = 'X';
+  println("Hello, World!");
+//   char* pos = (char*) VIDEO_MEMORY;
+//   *pos = 'X';
 }
