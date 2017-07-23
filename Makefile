@@ -1,5 +1,9 @@
 SHELL := /bin/bash
 
+# --- SETTINGS
+KERNEL_OFFSET := 0x1000
+
+# --- PROGRAMS
 CC   := i386-elf-gcc
 LD   := i386-elf-ld
 GDB  := i386-elf-gdb
@@ -8,18 +12,36 @@ NASM := nasm
 QEMU := qemu-system-x86_64
 MAKE := make
 
+# --- NASM FILES
+BOOT_AFILES   := boot disk enter print
+KERNEL_AFILES :=
+DRIVER_AFILES := 
+
+# --- HEADER FILES
+KERNEL_HFILES := print
+DRIVER_HFILES := ports
+
+# --- C FILES
+KERNEL_CFILES := main print
+DRIVER_CFILES := ports
+
 A := $(shell tput setaf 3 && tput bold)
 B := $(shell tput sgr0)
 
-HFILES := include/print.h
-OFILES := out/kernel.o out/print.o
-AFILES := asm/boot.asm asm/disk.asm asm/enter.asm asm/print.asm
+HFILES := $(patsubst %,include/kernel/%.h,$(KERNEL_HFILES)) \
+	  $(patsubst %,include/driver/%.h,$(DRIVER_HFILES))
 
-KERNEL_OFFSET := 0x1000
+OFILES := $(patsubst %,out/kernel/%.o,$(KERNEL_CFILES)) \
+	  $(patsubst %,out/driver/%.o,$(DRIVER_CFILES))
+
+AFILES := $(patsubst %,asm/boot/%.asm,$(BOOT_AFILES)) \
+	  $(patsubst %,asm/kernel/%.asm,$(KERNEL_AFILES)) \
+	  $(patsubst %,asm/driver/%.asm,$(DRIVER_AFILES))
+
 
 CFLAGS += -g -ffreestanding -funsigned-char -Iinclude/
 AFLAGS += -Iasm/
-LFLAGS += 
+LFLAGS +=
 
 build: | create_dir out/os.bin
 	@echo "$(A)build complete ...$(B)"
@@ -28,14 +50,14 @@ run: build
 	@echo "$(A)running emulator ...$(B)"
 	$(QEMU) -drive "format=raw,file=out/os.bin"
 
-debug: build out/kernel.elf
+debug: build
 	@echo "$(A)running emulator (DEBUG) ...$(B)"
 	$(QEMU) -s -S -drive "format=raw,file=out/os.bin" & echo $$! > out/kernel.pid
 	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file out/kernel.elf"
 	kill -SIGTERM "`cat out/kernel.pid`"
 
 create_dir:
-	test -d out || mkdir out
+	mkdir -p out/{kernel,driver} 2> /dev/null ||:
 
 build_cross:
 	$(eval BUILD_FOLDER := $(shell mktemp -d -t build.XXXXXXXXXX))
@@ -61,7 +83,7 @@ out/kernel.elf: out/kernel_entry.o $(OFILES)
 
 out/boot.bin: $(AFILES)
 	@echo "$(A)assembling the bootloader ...$(B)"
-	$(NASM) $(AFLAGS) asm/boot.asm -o out/boot.bin
+	$(NASM) $(AFLAGS) asm/boot/boot.asm -o out/boot.bin
 
 out/os.bin: out/boot.bin out/kernel.bin
 	@echo "$(A)putting both binaries together ...$(B)"

@@ -1,4 +1,4 @@
-#include <print.h>
+#include <kernel/print.h>
 
 #define VIDEO_MEMORY 0xB8000
 

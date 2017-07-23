@@ -14,9 +14,9 @@ KERNEL_OFFSET equ 1000h
     call disk_load
     jmp switch_pm                         ; will never return
 
-%include "print.asm"
-%include "enter.asm"
-%include "disk.asm"
+%include "boot/print.asm"
+%include "boot/enter.asm"
+%include "boot/disk.asm"
 
 [bits 32]                                 ; will be executed in 32bit,
 ENTER:                                    ; protected mode
