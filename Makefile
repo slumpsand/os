@@ -2,6 +2,7 @@ SHELL := /bin/bash
 
 CC   := i386-elf-gcc
 LD   := i386-elf-ld
+GDB  := i386-elf-gdb
 NASM := nasm
 QEMU := qemu-system-x86_64
 MAKE := make
@@ -26,6 +27,11 @@ run: build
 	@echo "$(A)running emulator ...$(B)"
 	$(QEMU) -drive "format=raw,file=out/os.bin"
 
+debug: build
+	@echo "$(A)running emulator (DEBUG) ...$(B)"
+	$(QEMU) -drive "format=raw,file=out/os.bin"
+	$(GDB) -es "target remote localhost:1234" -ex "symbol-file out/kernel.elf"
+
 create_dir:
 	test -d out || mkdir out
 
@@ -43,8 +49,12 @@ out/kernel_entry.o: asm/kernel.asm
 	$(NASM) $(AFLAGS) $< -f elf -o $@
 
 out/kernel.bin: out/kernel_entry.o $(OFILES)
-	@echo "$(A)linking the kernel ...$(B)"
+	@echo "$(A)linking the kernel (BIN) ...$(B)"
 	$(LD) $(LFLAGS) -o $@ -Ttext $(KERNEL_OFFSET) $^ --oformat binary
+
+out/kernel.elf: out/kernel_entry.o $(OFILES)
+	@echo "$(A)linking the kernel (ELF) ...$(B)"
+	$(LD) $(LFLAGS) -o R@ -Ttext $(KERNEL_OFFSET) $^
 
 out/boot.bin: $(AFILES)
 	@echo "$(A)assembling the bootloader ...$(B)"
