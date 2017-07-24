@@ -52,14 +52,19 @@ void vga_text_move_cursor() {
 void vga_text_next_line() {
   vga_text_cursor_col = 0;
 
-  if(++vga_text_cursor_row > VGA_TEXT_MAX_ROW) {
+  // scroll if necessary
+  if(++vga_text_cursor_row >= VGA_TEXT_MAX_ROW) {
+    // move all the lines up (except the first one)
     for (int i=1; i<VGA_TEXT_MAX_ROW; i++)
-      memcpy((char*) (vga_text_buffer + _vga_text_get_offset(i, 0) * 2),
-             (char*) (vga_text_buffer + _vga_text_get_offset(i-1, 0) * 2),
+      memcpy((char*) (vga_text_buffer + _vga_text_get_offset(i, 0)),
+             (char*) (vga_text_buffer + _vga_text_get_offset(i-1, 0)),
 	     VGA_TEXT_MAX_COL*2);
 
+    // clear the last line
     for (int i=0; i<VGA_TEXT_MAX_COL; i++)
       vga_text_buffer[_vga_text_get_offset(VGA_TEXT_MAX_ROW-1, i)] = 0;
+
+    vga_text_cursor_row--;
   }
 
   vga_text_update();
