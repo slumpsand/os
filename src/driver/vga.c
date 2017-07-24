@@ -16,12 +16,12 @@ void vga_text_update() {
   const short offset = vga_text_get_offset();
 
   // write the high byte
-  outb(0x03D4, 0x0E);
-  outb(0x03D5, offset >> 8);
+  outb(REG_SCREEN_CTRL, VGA_CURSOR_HIGH);
+  outb(REG_SCREEN_DATA, offset >> 8);
 
   // write the low byte
-  outb(0x03D4, 0x0E);
-  outb(0x03D5, offset & 0xFF);
+  outb(REG_SCREEN_CTRL, VGA_CURSOR_LOW);
+  outb(REG_SCREEN_DATA, offset & 0xFF);
 }
 
 void vga_text_clear() {
@@ -52,4 +52,10 @@ void vga_text_next_line() {
   // doesn't exceed VGA_TEXT_MAX_ROW ...
 
   vga_text_update();
+}
+
+void vga_text_init() {
+  vga_text_buffer = (short*) 0xB8000;
+  vga_text_cursor_color = VGA_TEXT_WHITE_ON_BLACK;
+  vga_text_clear();
 }

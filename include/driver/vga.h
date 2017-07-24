@@ -5,6 +5,7 @@
 #define VGA_TEXT_TAB_SIZE 4
 
 #define VGA_TEXT_WHITE_ON_BLACK 0x0F00
+#define VGA_TEXT_RED_ON_BLACK   0x0400
 
 extern short* vga_text_buffer;
 
@@ -26,3 +27,6 @@ void vga_text_move_cursor();
 
 // move the cursor into the next line
 void vga_text_next_line();
+
+// set default values and clear the screen
+void vga_text_init();
