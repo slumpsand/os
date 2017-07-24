@@ -19,11 +19,11 @@ DRIVER_AFILES :=
 
 # --- HEADER FILES
 KERNEL_HFILES := print
-DRIVER_HFILES := ports
+DRIVER_HFILES := ports vga
 
 # --- C FILES
 KERNEL_CFILES := main print
-DRIVER_CFILES := ports
+DRIVER_CFILES := ports vga
 
 A := $(shell tput setaf 3 && tput bold)
 B := $(shell tput sgr0)

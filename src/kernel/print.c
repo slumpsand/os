@@ -1,61 +1,32 @@
 #include <kernel/print.h>
 
-#define VIDEO_MEMORY 0xB8000
+#include <driver/vga.h>
 
-#define MAX_COL 160
-#define MAX_ROW 25
-#define TAB_SIZE 4
+void putc(const char ch) {
+  // put the character on the screen
+  const short offset = vga_text_get_offset();
+  vga_text_buffer[offset] = vga_text_cursor_color | ch;
 
-static int cursor_row, cursor_col;
-static short cursor_color;
-
-static short* get_pos() {
-  return (short*) (VIDEO_MEMORY + (2 * cursor_col + cursor_row * MAX_COL));
+  // move the cursor
+  vga_text_move_cursor();
 }
 
-static void move_cursor(int n) {
-  cursor_col += n;
-  if(cursor_col >= MAX_COL) {
-     cursor_col = 0;
-     cursor_row++;
-  }
-
-  if(cursor_row >= MAX_ROW) {
-    // TODO: move buffer up
-  }
-}
-
-void set_color(char color) {
-  cursor_color = (short)color << 8;
-}
-
-void set_cursor(int row, int column) {
-  cursor_row = row;
-  cursor_col = column;
-}
-
-void next_line() {
-  cursor_row++;
-  cursor_col = 0;
-}
-
-void putc(char ch) {
-  short* pos = get_pos();
-
-  *pos = cursor_color | ch;
-
-   move_cursor(1);
-}
-
-void print(char* str) {
+void print(const char* str) {
   char ch;
-  while(ch = *str++) {
-    switch(ch) {
+  while (ch = *str++) {
+    switch (ch) {
       case '\n':
-        next_line();
+        vga_text_next_line();
 	break;
+
       case '\t':
-        move_cursor(TAB_SIZE);
+	// move the cursor and reset the column if it wraped
+	// because tabs shouldn't go around newlines
+        for (int i = 0; i < VGA_TEXT_TAB_SIZE; i++) putc(' ');
+	if (vga_text_cursor_col < VGA_TEXT_TAB_SIZE) {
+          vga_text_cursor_col = 0;
+	  vga_text_update();
+	}
 	break;
 
       default:
@@ -64,39 +35,8 @@ void print(char* str) {
   }
 }
 
-void println(char* str) {
+void println(const char* str) {
   print(str);
-  if(cursor_col != 0) next_line();
-}
-
-void print_num(long val, char is_decimal) {
-  const char factor = (is_decimal) ? 10 : 16;
-  char str[8];
-  signed char index = 0;
-
-  while(val > 0) {
-    char v = val % factor + 0x30;
-    str[index++] = (v > 0x39) ? v + 7 : v;
-
-    val /= factor;
-  }
-
-  if(!is_decimal)
-    print("0x");
-
-  while(index >= 0) {
-    const char ch = str[index--];
-    if (ch != 0) putc(ch);
-  }
-}
-
-void clear() {
-  cursor_row = cursor_col = 0;
-
-  // yes, integers i just clear two shorts at the same time ...
-  int* pos = (int*) VIDEO_MEMORY;
-  int max_pos = (MAX_COL * MAX_ROW) / 2;
-
-  while(max_pos-- > 0)
-    *pos++ = 0;
+  if(vga_text_cursor_col != 0)
+    vga_text_next_line();
 }
