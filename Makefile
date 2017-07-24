@@ -18,11 +18,11 @@ KERNEL_AFILES :=
 DRIVER_AFILES := 
 
 # --- HEADER FILES
-KERNEL_HFILES := print
+KERNEL_HFILES := print util
 DRIVER_HFILES := ports vga
 
 # --- C FILES
-KERNEL_CFILES := main print
+KERNEL_CFILES := main print util
 DRIVER_CFILES := ports vga
 
 A := $(shell tput setaf 3 && tput bold)

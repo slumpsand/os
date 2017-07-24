@@ -8,7 +8,7 @@ KERNEL_OFFSET equ 1000h
     mov sp, bp
 
     mov bx, KERNEL_OFFSET
-    mov dh, 3                             ; for some reason this was '2' in the tutorial
+    mov dh, 4                             ; for some reason this was '2' in the tutorial
     mov dl, [BOOT_DRIVE]                  ; but that didn't work ...
 
     call disk_load
