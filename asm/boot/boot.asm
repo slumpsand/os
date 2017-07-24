@@ -23,7 +23,7 @@ ENTER:                                    ; protected mode
 
     call KERNEL_OFFSET                    ; start the kernel   
  
-    halt
+    jmp $
 
 BOOT_DRIVE db 0
 

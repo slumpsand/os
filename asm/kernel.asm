@@ -2,5 +2,5 @@
                                ; calls the main function that the linker
 [extern main]                  ; will tell NASM about later.
 
-call main                      ; call the main function
-jmp $
+    call main                      ; call the main function
+    jmp $

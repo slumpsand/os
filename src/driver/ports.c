@@ -1,25 +1,27 @@
-#include "driver/ports.h"
+#include <cpu/types.h>
 
-char inb(short port) {
-  char result;
+#include <driver/ports.h>
+
+u8 inb(u16 port) {
+  u8 result;
 
   __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
 
   return result;
 }
 
-void outb(short port, char data) {
+void outb(u16 port, u8 data) {
   __asm__("out %%al, %%dx" : : "a" (data) , "d" (port));
 }
 
-short inw(short port) {
-  short result;
+u16 inw(u16 port) {
+  u16 result;
 
   __asm__("in %%dx, %%ax" : "=a" (result) : "d" (port));
 
   return result;
 }
 
-void outw(short port, short data) {
+void outw(u16 port, u16 data) {
   __asm__("out %%ax, %%dx" : : "a" (data), "b" (port));
 }

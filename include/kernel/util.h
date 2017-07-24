@@ -1,5 +1,7 @@
 #pragma once
 
-void memcpy(char* src, char* dest, int n);
-void stringify_dec(int n, char* out);
-void stringify_hex(int n, char* out);
+#include <cpu/types.h>
+
+void memcpy(u8* src, u8* dest, u32 n);
+void stringify_dec(i32 n, u8* out);
+void stringify_hex(i32 n, u8* out);

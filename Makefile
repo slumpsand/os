@@ -3,7 +3,6 @@ SHELL := /bin/bash
 # --- SETTINGS
 KERNEL_OFFSET := 0x1000
 
-# --- PROGRAMS
 CC   := i386-elf-gcc
 LD   := i386-elf-ld
 GDB  := i386-elf-gdb
@@ -12,36 +11,16 @@ NASM := nasm
 QEMU := qemu-system-i386
 MAKE := make
 
-# --- NASM FILES
-BOOT_AFILES   := boot disk enter print
-KERNEL_AFILES :=
-DRIVER_AFILES := 
-
-# --- HEADER FILES
-KERNEL_HFILES := print util
-DRIVER_HFILES := ports vga
-
-# --- C FILES
-KERNEL_CFILES := main print util
-DRIVER_CFILES := ports vga
-
 A := $(shell tput setaf 3 && tput bold)
 B := $(shell tput sgr0)
 
-HFILES := $(patsubst %,include/kernel/%.h,$(KERNEL_HFILES)) \
-	  $(patsubst %,include/driver/%.h,$(DRIVER_HFILES))
+HFILES := $(wildcard include/*/*.h)
+OFILES := $(patsubst src/%.c,out/%.o,$(wildcard src/*/*.c))
+AFILES := $(wildcard asm/boot/*.asm)
 
-OFILES := $(patsubst %,out/kernel/%.o,$(KERNEL_CFILES)) \
-	  $(patsubst %,out/driver/%.o,$(DRIVER_CFILES))
-
-AFILES := $(patsubst %,asm/boot/%.asm,$(BOOT_AFILES)) \
-	  $(patsubst %,asm/kernel/%.asm,$(KERNEL_AFILES)) \
-	  $(patsubst %,asm/driver/%.asm,$(DRIVER_AFILES))
-
-
-CFLAGS += -g -ffreestanding -funsigned-char -Iinclude/
+CFLAGS += -g -ffreestanding -Iinclude/
 AFLAGS += -Iasm/
-LFLAGS +=
+LFLAGS += -e $(KERNEL_OFFSET) -Ttext $(KERNEL_OFFSET)
 
 build: | create_dir out/os.bin
 	@echo "$(A)build complete ...$(B)"
@@ -79,7 +58,7 @@ out/kernel.bin: out/kernel.elf
 
 out/kernel.elf: out/kernel_entry.o $(OFILES)
 	@echo "$(A)linking the kernel ...$(B)"
-	$(LD) $(LFLAGS) -o $@ -Ttext $(KERNEL_OFFSET) $^
+	$(LD) $(LFLAGS) -o $@ $^
 
 out/boot.bin: $(AFILES)
 	@echo "$(A)assembling the bootloader ...$(B)"

@@ -28,13 +28,13 @@ disk_load:                              ; load DH sectors from drive DL into ES:
     mov dh, ah
     call print_hex
 
-    hlt
+    jmp $
 
 .sector_error:
     mov bx, .SECTOR_ERROR
     call print
 
-    hlt
+    jmp $
 
 .DISK_ERROR:       db "Can't read from disk.", 0
 .SECTOR_ERROR:     db "Incorrect number of sectors.", 0
