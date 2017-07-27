@@ -2,7 +2,7 @@
 
 #include <kernel/print.h>
 
-#include <driver/vga.h>
+#include <drivers/vga.h>
 
 void putc(const u8 ch) {
   // put the character on the screen
@@ -15,7 +15,7 @@ void putc(const u8 ch) {
 
 void print(const u8* str) {
   u8 ch;
-  while (ch = *str++) {
+  while ((ch = *str++)) {
     switch (ch) {
       case '\n':
         vga_text_next_line();

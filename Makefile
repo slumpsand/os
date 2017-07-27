@@ -1,71 +1,50 @@
-SHELL := /bin/bash
+export MAKE := make
+export CC   := i386-elf-gcc
+export LD   := i386-elf-ld
+export GDB  := i386-elf-gdb
+export OBJ  := i386-elf-objcopy
+export AR   := i386-elf-ar
+export QEMU := qemu-system-i386
+export NASM := nasm
 
-# --- SETTINGS
-KERNEL_OFFSET := 0x1000
+export A := $(shell tput setaf 6 && tput bold)
+export B := $(shell tput sgr0)
 
-CC   := i386-elf-gcc
-LD   := i386-elf-ld
-GDB  := i386-elf-gdb
-OBJ  := i386-elf-objcopy
-NASM := nasm
-QEMU := qemu-system-i386
-MAKE := make
+export LFLAGS :=
+export AFLAGS := -f elf
+export CFLAGS := -g3 -ffreestanding -I.. -Wall -Og -funsigned-char
 
-A := $(shell tput setaf 3 && tput bold)
-B := $(shell tput sgr0)
+HFILES := $(wildcard **/*.h)
 
-HFILES := $(wildcard include/*/*.h)
-OFILES := $(patsubst src/%.c,out/%.o,$(wildcard src/*/*.c))
-AFILES := $(wildcard asm/boot/*.asm)
+build: | out/ out/kernel.bin
+	@echo "$(A)combining binaries ...$(B)"
+	cat out/boot.bin out/kernel.bin > out/os.bin
+	@echo "$(A)build completed successfully$(B)"
 
-CFLAGS += -g -ffreestanding -Iinclude/
-AFLAGS += -Iasm/
-LFLAGS += -e $(KERNEL_OFFSET) -Ttext $(KERNEL_OFFSET)
+clean:
+	@echo "$(A)cleaning up ...$(B)"
+	rm -rf out/ cpu/*.o drivers/*.o kernel/*.o ||:
 
-build: | create_dir out/os.bin
-	@echo "$(A)build complete ...$(B)"
+out/:
+	mkdir -p out/
 
-run: build
-	@echo "$(A)running emulator ...$(B)"
-	$(QEMU) -drive "format=raw,file=out/os.bin"
+out/%.a: $(wildcard %/**/*.asm) $(wildcard %/**/*.c) $(HFILES) %/Makefile Makefile
+	cd $(patsubst out/%.a,%,$@) && $(MAKE)
 
-debug: build
-	@echo "$(A)running emulator (DEBUG) ...$(B)"
-	$(QEMU) -s -S -drive "format=raw,file=out/os.bin" & echo $$! > out/kernel.pid
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file out/kernel.elf"
-	kill -SIGTERM "`cat out/kernel.pid`"
+out/kernel_entry.o: kernel.asm
+	@echo "$(A)assembling '$@' ...$(B)"
+	$(NASM) $(AFLAGS) $< -o $@
 
-create_dir:
-	mkdir -p out/{kernel,driver} 2> /dev/null ||:
-
-build_cross:
-	$(eval BUILD_FOLDER := $(shell mktemp -d -t build.XXXXXXXXXX))
-	cp cross.mk $(BUILD_FOLDER)/
-	cd $(BUILD_FOLDER) && make -f cross.mk
-	@echo "($A)successfully build cross-compiler into '/opt/cross' ...$(B)"
-
-out/%.o: src/%.c $(HFILES)
-	@echo "$(A)compiling the file '$<' ...$(B)"
-	$(CC) $(CFLAGS) -c $< -o $@
-
-out/kernel_entry.o: asm/kernel.asm
-	@echo "$(A)assembling the kernel '$<' ...$(B)"
-	$(NASM) $(AFLAGS) $< -f elf -o $@
-
-out/kernel.bin: out/kernel.elf
-	@echo "$(A)extracting the binary ...$(B)"
-	$(OBJ) -O binary $< $@
-
-out/kernel.elf: out/kernel_entry.o $(OFILES)
-	@echo "$(A)linking the kernel ...$(B)"
+out/kernel.elf: out/kernel_entry.o out/cpu.a out/drivers.a out/kernel.a
+	@echo "$(A)linking kernel ...$(B)"
 	$(LD) $(LFLAGS) -o $@ $^
 
-out/boot.bin: $(AFILES)
-	@echo "$(A)assembling the bootloader ...$(B)"
-	$(NASM) $(AFLAGS) asm/boot/boot.asm -o out/boot.bin
+out/kernel.bin: out/kernel.elf
+	@echo "$(A)extracting kernel binary ...$(B)"
+	$(OBJ) -O binary $< $@
 
-out/os.bin: out/boot.bin out/kernel.bin
-	@echo "$(A)putting both binaries together ...$(B)"
-	cat $^ > $@
+out/boot.bin: $(wildcard boot/**/*.asm) boot/Makefile Makefile
+	@echo "$(A)building bootloader ...$(B)"
+	cd boot && $(MAKE)
 
-.PHONY: build create_dir build_cross
+.PHONY: build clean

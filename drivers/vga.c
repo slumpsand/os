@@ -1,7 +1,7 @@
 #include <cpu/types.h>
 
-#include <driver/vga.h>
-#include <driver/ports.h>
+#include <drivers/vga.h>
+#include <drivers/ports.h>
 
 #include <kernel/util.h>
 

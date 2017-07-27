@@ -1,6 +1,6 @@
 #include <cpu/types.h>
 
-#include <driver/ports.h>
+#include <drivers/ports.h>
 
 u8 inb(u16 port) {
   u8 result;
