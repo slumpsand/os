@@ -19,7 +19,7 @@ GDT_ACCESS:
 .DC_FORBID equ 0 << 2
 
 .RW_ALLOW equ 1 << 1
-.RW_FORBIT euq 0 << 1
+.RW_FORBIT equ 0 << 1
 
 GDT_FLAGS:
 .GR_BYTES equ 0 << 7

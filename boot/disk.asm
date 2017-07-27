@@ -3,7 +3,6 @@
 BOOT_DRIVE              resb 1
 
 SECTORS_PER_CYLINDER equ 18
-CYLINDERS_PER_HEAD equ
 
 load_text:
         mov ah, 0x02
