@@ -1,3 +1,5 @@
+[bits 16]
+
 print:
         pusha
         mov ah, 0x0E

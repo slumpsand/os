@@ -1,5 +1,8 @@
 [bits 16]
 switch_pm:
+        mov bx, MSG_SWITCH
+        call println
+
         cli
         lgdt [gdt_descriptor]
 
@@ -8,6 +11,8 @@ switch_pm:
         mov cr0, eax
 
         jmp CODE_SEG:init_pm
+
+MSG_SWITCH db "Switching into 32-bit mode", 0
 
 [bits 32]
 init_pm:

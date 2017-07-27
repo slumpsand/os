@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 MAKE := make
 CC   := i386-elf-gcc
 LD   := i386-elf-ld
@@ -22,9 +24,9 @@ OFILES := boot/kernel_entry.o $(patsubst %.c,%.o,$(wildcard **/*.c)) \
 					$(patsubst %.asm,%.o, $(wildcard drivers/**/*.asm)) \
 					$(patsubst %.asm,%.o, $(wildcard kernel/**/*.asm))
 
-build: | out/ out/kernel.bin out/boot.bin
+build: | out/ out/kernel.bin out/boot.bin out/empty.bin
 	@echo "$(A)combining binaries ...$(B)"
-	cat out/boot.bin out/kernel.bin > out/os.bin
+	cat out/boot.bin out/kernel.bin out/empty.bin > out/os.bin
 	@echo "$(A)build completed successfully$(B)"
 
 rebuild: | clean build
@@ -61,6 +63,13 @@ out/kernel.elf: $(OFILES)
 out/kernel.bin: out/kernel.elf
 	@echo "$(A)extracting kernel binary ...$(B)"
 	$(OBJ) -O binary $< $@
+
+# It will cause an error if the bootloader tries to load more sectors from
+# disk than the disk-size. Usually that would just be zeroes but QEMU can't
+# to it. Just create an empty file ...
+out/empty.bin:
+	BYTES="$$((8388608 - `wc -c < out/boot.bin` - `wc -c < out/kernel.bin`))" \
+		&& dd if=/dev/zero of=out/empty.bin bs=$${BYTES} count=1
 
 out/boot.bin: $(wildcard boot/**/*.asm) Makefile
 	@echo "$(A)building bootloader ...$(B)"

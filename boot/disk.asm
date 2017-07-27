@@ -1,3 +1,4 @@
+[bits 16]
 disk_load:
         pusha
         push dx
@@ -35,3 +36,4 @@ disk_load:
 
 MSG_DISK_ERROR db "Can not read from disk", 0
 MSG_SECTOR_ERROR db "Invalid amount of sectors read", 0
+MSG_STEP db "Step", 0
