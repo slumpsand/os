@@ -39,15 +39,15 @@ load_kernel:
 [bits 32]
 BEGIN:
         mov ebx, MSG_PROT_MODE
-        call pm_println
+        call pm_print
 
         call KERNEL_OFFSET                                                      ; call the kernel
         jmp $
 
 BOOT_DRIVE db 0
-MSG_REAL_MODE "I am in 16-Bit Real-Mode right now.", 0
-MSG_PROT_MODE "I am in 32-bit Protected-Mode right now.", 0
-MSG_LOAD_KERNEL "Loading kernel into memory", 0
+MSG_REAL_MODE db "I am in 16-Bit Real-Mode right now.", 0
+MSG_PROT_MODE db "I am in 32-bit Protected-Mode right now.", 0
+MSG_LOAD_KERNEL db "Loading kernel into memory", 0
 
 times 510 - ($ - $$) db 0                                                       ; add some padding + magic number
 dw 0xAA55

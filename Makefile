@@ -33,6 +33,16 @@ clean:
 	@echo "$(A)cleaning up ...$(B)"
 	rm -rf out/ boot/*.o cpu/*.o drivers/*.o kernel/*.o ||:
 
+run: build
+	@echo "$(A)running emulator ...$(B)"
+	$(QEMU) -drive "format=raw,file=out/os.bin"
+
+debug: build
+	@echo "$(A)running emulator (DEBUG) ...$(B)"
+	$(QEMU) -s -S -drive "format=raw,file=out/os.bin" & echo $$! > out/kernel.pid
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file out/kernel.elf"
+	kill -SIGTERM "`cat out/kernel.pid`"
+
 out/:
 	mkdir -p out/
 
@@ -56,4 +66,4 @@ out/boot.bin: $(wildcard boot/**/*.asm) Makefile
 	@echo "$(A)building bootloader ...$(B)"
 	$(NASM) -I boot/ -o $@ boot/entry.asm
 
-.PHONY: build clean rebuild
+.PHONY: build clean rebuild run debug
