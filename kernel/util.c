@@ -2,12 +2,12 @@
 
 #include <kernel/util.h>
 
-void memcpy(u8* src, u8* dest, u32 n) {
+void memcpy(const u8* src, u8* dest, u32 n) {
   for (u32 i=0; i<n; i++)
     dest[i] = src[i];
 }
 
-void stringify_dec(i32 n, u8* out) {
+void stringify_dec(i32 n, char* out) {
   const bool sign = n < 0;
   if (sign) n = -n;
 
@@ -22,7 +22,7 @@ void stringify_dec(i32 n, u8* out) {
   // TODO: reverse the string
 }
 
-void stringify_hex(i32 n, u8* out) {
+void stringify_hex(i32 n, char* out) {
   const bool sign = n < 0;
   if (sign) n = -n;
 
