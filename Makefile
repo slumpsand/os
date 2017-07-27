@@ -20,9 +20,9 @@ CFLAGS := -g3 -ffreestanding -I. -Wall -funsigned-char
 
 HFILES := $(wildcard **/*.h)
 OFILES := boot/kernel_entry.o $(patsubst %.c,%.o,$(wildcard **/*.c)) \
-					$(patsubst %.asm,%.o, $(wildcard cpu/**/*.asm)) \
-					$(patsubst %.asm,%.o, $(wildcard drivers/**/*.asm)) \
-					$(patsubst %.asm,%.o, $(wildcard kernel/**/*.asm))
+					$(patsubst %.asm,%.o, $(wildcard cpu/*.asm)) \
+					$(patsubst %.asm,%.o, $(wildcard drivers/*.asm)) \
+					$(patsubst %.asm,%.o, $(wildcard kernel/*.asm))
 
 build: | out/ out/kernel.bin out/boot.bin out/empty.bin
 	@echo "$(A)combining binaries ...$(B)"
@@ -71,7 +71,7 @@ out/empty.bin:
 	BYTES="$$((8388608 - `wc -c < out/boot.bin` - `wc -c < out/kernel.bin`))" \
 		&& dd if=/dev/zero of=out/empty.bin bs=$${BYTES} count=1
 
-out/boot.bin: $(wildcard boot/**/*.asm) Makefile
+out/boot.bin: $(wildcard boot/*.asm) Makefile
 	@echo "$(A)building bootloader ...$(B)"
 	$(NASM) -I boot/ -o $@ boot/entry.asm
 

@@ -1,6 +1,6 @@
 [bits 16]
 
-print:
+println:
         pusha
         mov ah, 0x0E
 
@@ -15,12 +15,6 @@ print:
         jmp .loop
 
 .end:
-        popa
-        ret
-
-print_nl:
-        pusha
-
         mov ax, 0x0E0A
         int 0x10
 
@@ -58,16 +52,12 @@ print_hex:
 
 .end:
         mov bx, .out
-        call print
+        call println
 
         popa
         ret
 
 .out db "0x0000", 0
-
-println:
-        call print
-        call print_nl
 
 [bits 32]
 pm_print:
