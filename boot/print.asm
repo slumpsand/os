@@ -1,67 +1,89 @@
-[bits 16]
-print:                             ; bx points at the string
-    pusha
+print:
+        pusha
+        mov ah, 0x0E
 
 .loop:
-    mov al, [bx]
-    cmp al, 0
-    je .end
+        mov al, [bx]
+        cmp al, 0
+        je .end
 
-    mov ah, 0x0E
-    int 0x10
+        int 0x10
 
-    inc bx
-    jmp .loop
+        inc bx
+        jmp .loop
 
 .end:
-    popa
-    ret
+        popa
+        ret
 
 print_nl:
-    pusha
+        pusha
 
-    mov ax, 0x0E0A
-    int 0x10
+        mov ax, 0x0E0A
+        int 0x10
 
-    mov ax, 0x0E0D
-    int 0x10
+        mov ax, 0x0E0D
+        int 0x10
 
-    popa
-    ret
+        popa
+        ret
 
-print_hex:                         ; dx points at the word
-    pusha
+print_hex:
+        pusha
 
-    mov cx, 0
+        mov cx, 0
 
 .loop:
-    cmp cx, 4
-    je .end
+        cmp cx, 4
+        je .end
 
-    mov ax, dx
-    and ax, 0x0F
-    add ax, 0x30
+        mov ax, dx
+        and ax, 0x000F
+        add al, 0x30
 
-    cmp al, 0x39
-    jle .step2
-
-    add al, 7
+        cmp al, 0x39
+        jle .step2
+        add al, 7
 
 .step2:
-    mov bx, .HEX_OUT + 5
-    sub bx, cx
-    mov [bx], al
-    ror dx, 4
+        mov bx, .out + 5
+        sub bx, cx
+        mov [bx], al
+        ror dx, 4
 
-    inc cx
-    jmp .loop
+        inc cx
+        jmp .loop
 
 .end:
-    mov bx, .HEX_OUT
-    call print
+        mov bx, .out
+        call print
 
-    popa
-    ret
+        popa
+        ret
 
-.HEX_OUT:
-    db "0x0000", 0
+.out db "0x0000", 0
+
+println:
+        call print
+        call print_nl
+
+[bits 32]
+pm_print:
+        pusha
+        mov edx, VIDEO_MEMORY
+        mov ah, WHITE_ON_BLACK
+
+.loop:
+        mov al, [eax]
+        cmp al, 0
+        je .end
+
+        mov [edx], ax
+        inc ebx
+        add edx, 2
+
+        jmp .loop
+
+.end:
+        popa
+        ret

@@ -1,58 +1,37 @@
-[bits 16]
+disk_load:
+        pusha
+        push dx
 
-BOOT_DRIVE              resb 1
-
-SECTORS_PER_CYLINDER equ 18
-
-load_text:
         mov ah, 0x02
-        mov al, CODE_SEC_SIZE
-
-        mov ch, CODE_SEC_OFFSET / SECTORS_PER_CYLINDER
-        mov cl, CODE_SEC_OFFSET % SECTORS_PER_CYLINDER
-
-        mov dh, 0x00
-        mov dl, [BOOT_DRIVE]
-
-        mov es, 0x0000
-        mov bx, CODE_SEC_OFFSET * 512
-
-        int 0x13
-        jc disk_error
-
-        cmp al, CODE_SEC_SIZE
-        jne sector_error
-
-        ret
-
-load_data:
-        mov ah, 0x02
-        mov al, DATA_SEC_SIZE
-
+        mov al, dh
+        mov cl, 0x02
         mov ch, 0x00
-
-        mov dh, 0
-        mov dl, [BOOT_DRIVE]
-
-        mov es, 0x0000
-        mov bx, DATA_SEC_OFFSET * 512
+        mov dh, 0x00
 
         int 0x13
-        jc disk_error
+        jc .derror
 
-        cmp al, DATA_SEC_SIZE
-        jne sector_error
+        pop dx
+        cmp al, dh
+        jne .serror
 
+        popa
         ret
 
-disk_error:
-        mov bx, .MESSAGE
+.derror:
+        mov bx, MSG_DISK_ERROR
         call println
-        jmp $
-.MESSAGE db "disk error while reading segments", 0
 
-sector_error:
-        mov bx, .MESSAGE
-        call println
+        mov dh, ah
+        call print_hex
+
         jmp $
-.MESSAGE db "disk-sector error while reading segments", 0
+
+.serror:
+        mov bx, MSG_SECTOR_ERROR
+        call println
+
+        jmp $
+
+MSG_DISK_ERROR db "Can not read from disk", 0
+MSG_SECTOR_ERROR db "Invalid amount of sectors read", 0
