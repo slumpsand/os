@@ -5,11 +5,9 @@
 #include <drivers/vga.h>
 
 void putc(const char ch) {
-  // put the character on the screen
   const u16 offset = vga_text_get_offset();
   vga_text_buffer[offset] = vga_text_cursor_color | ch;
 
-  // move the cursor
   vga_text_move_cursor();
 }
 

@@ -109,7 +109,7 @@ vga_text_next_line:
 
         mov ecx, VIDEO_MEMORY
 
-.loop:
+.loop1:
         mov eax, ecx
         add ecx, VGA_TEXT_MAX_COL * 2
         push ecx
@@ -120,9 +120,18 @@ vga_text_next_line:
         call memcpy
 
         pop ecx
-        cmp ecx, VIDEO_MEMORY + (VGA_TEXT_MAX_ROW - 1) * VGA_TEXT_MAX_COL * 2           ; THE MISTAKE IS HERE ...
-        jl .loop
+        cmp ecx, VIDEO_MEMORY + (VGA_TEXT_MAX_ROW - 1) * VGA_TEXT_MAX_COL * 2
+        jl .loop1
 
 .end:
+        mov ecx, VGA_TEXT_MAX_COL
+
+.loop2:
+        mov eax, VIDEO_MEMORY + (VGA_TEXT_MAX_ROW - 1) * VGA_TEXT_MAX_COL * 2
+        add eax, ecx
+
+        mov word [eax], 0
+        loop .loop2
+
         call vga_text_update
-        ret
+        ret                             ; THIS RETURN GOES TO THE WRONG PLACE, MAYBE I USED POP TO MUCH? OR PUSH?
