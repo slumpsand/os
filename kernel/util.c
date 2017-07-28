@@ -7,6 +7,11 @@ void memcpy(const u8* src, u8* dest, u32 n) {
     dest[i] = src[i];
 }
 
+void memcpy2(u8* dest, const u8* src, u32 n) {
+  memcpy(src, dest, n);
+}
+
+
 void stringify_dec(i32 n, char* out) {
   const bool sign = n < 0;
   if (sign) n = -n;

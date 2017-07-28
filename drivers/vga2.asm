@@ -2,9 +2,9 @@ global vga_text_move_cursor
 global vga_text_init
 global vga_text_update
 global vga_text_clear
+global vga_text_next_line
 
 ; funcitons
-[extern vga_text_next_line]
 [extern vga_text_get_offset]
 [extern outb]
 [extern putc]
@@ -14,6 +14,7 @@ global vga_text_clear
 [extern vga_text_cursor_row]
 [extern vga_text_cursor_color]
 [extern vga_text_buffer]
+[extern memcpy2]
 
 ; constants
 VGA_TEXT_MAX_COL equ 80
@@ -97,3 +98,54 @@ vga_text_clear:
 
         call vga_text_update
         ret
+
+; void vga_text_next_line()
+vga_text_next_line:
+        mov byte [vga_text_cursor_col], 0       ; vga_text_cursor_col = 0
+
+        inc byte [vga_text_cursor_row]          ; if(++vga_text_cursor_row >= VGA_TEXT_MAX_ROW)
+        cmp byte [vga_text_cursor_row], VGA_TEXT_MAX_ROW
+        jl .end
+
+        mov ecx, VIDEO_MEMORY
+
+.loop:
+        mov eax, ecx
+        add ecx, VGA_TEXT_MAX_COL * 2
+        push ecx
+
+        push dword VGA_TEXT_MAX_COL * 2
+        push eax
+        push ecx
+        call memcpy2
+
+        pop ecx
+        cmp ecx, VIDEO_MEMORY + VGA_TEXT_MAX_ROW * VGA_TEXT_MAX_COL * 2
+        jl .loop
+
+.end:
+        call vga_text_update ; vga_text_update()
+        ret
+
+; return row * VGA_TEXT_MAX_COL + col;
+
+; void vga_text_next_line() {
+;   vga_text_cursor_col = 0;
+;
+;   // scroll if necessary
+;   if(++vga_text_cursor_row >= VGA_TEXT_MAX_ROW) {
+;     // move all the lines up (except the first one)
+;     for (u8 i=1; i<VGA_TEXT_MAX_ROW; i++)
+;       memcpy((u8*) (vga_text_buffer + _vga_text_get_offset(i, 0)),
+;              (u8*) (vga_text_buffer + _vga_text_get_offset(i-1, 0)),
+; 	     VGA_TEXT_MAX_COL*2);
+;
+;     // clear the last line
+;     for (u8 i=0; i<VGA_TEXT_MAX_COL; i++)
+;       vga_text_buffer[_vga_text_get_offset(VGA_TEXT_MAX_ROW-1, i)] = 0;
+;
+;     vga_text_cursor_row--;
+;   }
+;
+;   vga_text_update();
+; }
