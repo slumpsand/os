@@ -47,26 +47,19 @@ vga_text_init:
         ret
 
 ; void vga_text_update()
-vga_text_update:                        ; TODO: this doesn't work!
+vga_text_update:
         call vga_text_get_offset
-        mov bx, ax
-
-        shr ax, 8
-        and bx, 0x00FF
-
-        push VGA_CURSOR_HIGH
-        push REG_SCREEN_CTRL
-        call outb
 
         push ax
-        push REG_SCREEN_DATA
-        call outb
+        shr ax, 8
 
-        push VGA_CURSOR_LOW
-        push REG_SCREEN_CTRL
+        mov byte [REG_SCREEN_CTRL], VGA_CURSOR_HIGH
+        mov byte [REG_SCREEN_DATA], al
 
-        push bx
-        push REG_SCREEN_DATA
-        call outb
+        pop ax
+        and ax, 0x00FF
+
+        mov byte [REG_SCREEN_CTRL], VGA_CURSOR_LOW
+        mov byte [REG_SCREEN_DATA], al
 
         ret
