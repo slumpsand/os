@@ -19,18 +19,6 @@ u16 vga_text_get_offset() {
   return _vga_text_get_offset(vga_text_cursor_row, vga_text_cursor_col);
 }
 
-void vga_text_clear() {
-  // reset the buffer
-  for (u8 r = 0; r < VGA_TEXT_MAX_ROW; r++)
-    for (u8 c = 0; c < VGA_TEXT_MAX_COL; c++)
-      vga_text_buffer[r*VGA_TEXT_MAX_COL + c] = 0;
-
-  // reset the cursor
-  vga_text_cursor_row = 0;
-  vga_text_cursor_col = 0;
-  vga_text_update();
-}
-
 void vga_text_next_line() {
   vga_text_cursor_col = 0;
 
