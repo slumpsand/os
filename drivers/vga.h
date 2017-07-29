@@ -11,15 +11,12 @@
 
 extern u16* vga_text_buffer;
 
-extern u8 vga_text_cursor_row;
-extern u8 vga_text_cursor_col;
+extern u16 vga_text_cursor_row;
+extern u16 vga_text_cursor_col;
 extern u16 vga_text_cursor_color;
 
 // update the cursor position on the screen
 void vga_text_update();
-
-// clear the screen and reset the cursor to (0, 0)
-void vga_text_clear();
 
 // get the offset in the vga_text_buffer
 u16 vga_text_get_offset();
@@ -30,5 +27,5 @@ void vga_text_move_cursor();
 // move the cursor into the next line
 void vga_text_next_line();
 
-// set default values and clear the screen
-void vga_text_init();
+// clear the screen
+void vga_text_clear();
