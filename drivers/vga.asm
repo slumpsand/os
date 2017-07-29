@@ -100,17 +100,9 @@ vga_text_next_line:
         cmp word [vga_text_cursor_row], MAX_ROW
         jl .end
 
-        call .scroll_up
-        call .clear_last_row
-.end:
-        call vga_text_update
-
-        ret
-
-; void _scroll_up()
-.scroll_up:
+        ; move all rows one up, except the first one (scrolling)
         mov ecx, VIDEO
-.scroll_loop:
+.loop1:
         mov eax, ecx
         add ecx, MAX_COL * 2
 
@@ -123,21 +115,21 @@ vga_text_next_line:
         add esp, 8
 
         cmp ecx, VIDEO + (MAX_ROW - 1) * MAX_COL * 2
-        jl .scroll_loop
+        jl .loop1
 
+        ; move the cursor one up and clear the row
         dec word [vga_text_cursor_row]
-
-        ret
-
-; void _clear_last_row()
-.clear_last_row:
         mov ecx, MAX_COL
-.clear_loop:
+.loop2:
         mov eax, ecx
         add eax, VIDEO + (MAX_ROW - 1) * MAX_COL * 2
 
         mov word [eax], 0
-        loop .clear_loop
+        loop .loop2
+
+.end:
+        call vga_text_update
+
         ret
 
 ; u16 vga_text_get_offset()
