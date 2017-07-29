@@ -29,3 +29,5 @@ void vga_text_next_line();
 
 // clear the screen
 void vga_text_clear();
+
+void vga_text_set_cursor(u16 x, u16 y);

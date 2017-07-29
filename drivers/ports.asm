@@ -5,30 +5,30 @@ global inw
 
 ; void outb(u16 port, u8 data)
 outb:
-        mov bx, [esp + 2]
-        mov cl, [esp + 5]
-        mov byte [bx], cl
+        mov dx, [esp + 4]
+        mov al, [esp + 8]
+        out dx, al
 
         ret
 
 ; void outw(u16 port, u16 data)
 outw:
-        mov bx, [esp + 2]
-        mov cx, [esp + 6]
-        mov word [bx], cx
+        mov dx, [esp + 4]
+        mov ax, [esp + 8]
+        out dx, ax
 
         ret
 
 ; u8 inb(u16 port)
 inb:
-        mov bx, [esp + 2]
-        mov al, [bx]
+        mov dx, [esp + 4]
+        in al, dx
 
         ret
 
 ; u16 inw(u16 port)
 inw:
-        mov bx, [esp + 2]
-        mov ax, [bx]
+        mov dx, [esp + 4]
+        in ax, dx
 
         ret

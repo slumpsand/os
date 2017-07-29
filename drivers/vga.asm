@@ -5,6 +5,7 @@ global vga_text_update
 global vga_text_clear
 global vga_text_next_line
 global vga_text_get_offset
+global vga_text_set_cursor
 
 ; varaible symbols
 global vga_text_cursor_col
@@ -139,4 +140,39 @@ vga_text_get_offset:
         mul bx
 
         add ax, [vga_text_cursor_col]
+        ret
+
+; void vga_text_set_cursor(u16 x, u16 y)
+vga_text_set_cursor:
+        ; set the row
+        mov ax, [esp + 8]
+        mov [vga_text_cursor_row], ax
+
+        ; set the column
+        mov cx, [esp + 4]
+        mov [vga_text_cursor_col], cx
+
+        ; calculate the offset
+        mov bx, MAX_COL
+        mul bx
+        add cx, ax
+
+        ; send the lower byte to the VGA
+        mov al, 0x0F
+        mov dx, 0x03D4
+        out dx, al
+
+        mov al, cl
+        mov dx, 0x03D5
+        out dx, al
+
+        ; send the higher byte to the VGA
+        mov al, 0x0E
+        mov dx, 0x03D4
+        out dx, al
+
+        mov al, ch
+        mov dx, 0x03D5
+        out dx, al
+
         ret
