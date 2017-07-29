@@ -2,10 +2,8 @@
 
 #include <kernel/print.h>
 
-#include <drivers/vga.h>
+#include <drivers/vga2.h>
 
 void main() {
-  //vga_text_init();
-
-  println("Hello, World!");
+  vga_text_init2();
 }
