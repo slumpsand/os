@@ -5,16 +5,16 @@ global vga_text_clear
 global vga_text_next_line
 
 ; funcitons
-[extern vga_text_get_offset]
-[extern outb]
-[extern putc]
+extern vga_text_get_offset
+extern outb
+extern putc
 
 ; variables
-[extern vga_text_cursor_col]
-[extern vga_text_cursor_row]
-[extern vga_text_cursor_color]
-[extern vga_text_buffer]
-[extern memcpy]
+extern vga_text_cursor_col
+extern vga_text_cursor_row
+extern vga_text_cursor_color
+extern vga_text_buffer
+extern memcpy
 
 ; constants
 VGA_TEXT_MAX_COL equ 80
@@ -101,18 +101,27 @@ vga_text_clear:
 
 ; void vga_text_next_line()
 vga_text_next_line:
+        ; set the cursor to the next line
         mov byte [vga_text_cursor_col], 0
-
         inc byte [vga_text_cursor_row]
+
+        ; check if it's required to scroll the screen
         cmp byte [vga_text_cursor_row], VGA_TEXT_MAX_ROW
         jl .end
 
-        mov ecx, VIDEO_MEMORY
+        call .scroll_up
+        call .clear_last_row
+.end:
+        call vga_text_update
 
-.loop1:
+        ret
+
+; void _scroll_up()
+.scroll_up:
+        mov ecx, VIDEO_MEMORY
+.scroll_loop:
         mov eax, ecx
         add ecx, VGA_TEXT_MAX_COL * 2
-        push ecx
 
         push dword VGA_TEXT_MAX_COL * 2
         push eax
@@ -120,18 +129,22 @@ vga_text_next_line:
         call memcpy
 
         pop ecx
+        add esp, 8
+
         cmp ecx, VIDEO_MEMORY + (VGA_TEXT_MAX_ROW - 1) * VGA_TEXT_MAX_COL * 2
-        jl .loop1
+        jl .scroll_loop
 
-.end:
+        dec byte [vga_text_cursor_row]
+
+        ret
+
+; void _clear_last_row()
+.clear_last_row:
         mov ecx, VGA_TEXT_MAX_COL
-
-.loop2:
-        mov eax, VIDEO_MEMORY + (VGA_TEXT_MAX_ROW - 1) * VGA_TEXT_MAX_COL * 2
-        add eax, ecx
+.clear_loop:
+        mov eax, ecx
+        add eax, VIDEO_MEMORY + (VGA_TEXT_MAX_ROW - 1) * VGA_TEXT_MAX_COL * 2
 
         mov word [eax], 0
-        loop .loop2
-
-        call vga_text_update
-        ret                             ; THIS RETURN GOES TO THE WRONG PLACE, MAYBE I USED POP TO MUCH? OR PUSH?
+        loop .clear_loop
+        ret
