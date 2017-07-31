@@ -21,7 +21,7 @@ vga_text_init2:
 
         mov dx, 0x03D5
         in al, dx
-        mov ch, al
+        mov ah, al
 
         ; read the lower cursor-byte
         mov al, 0x0F
@@ -30,7 +30,6 @@ vga_text_init2:
 
         mov dx, 0x03D5
         in al, dx
-        mov ah, ch
 
         mov [offset], ax
 
@@ -64,11 +63,8 @@ _move_cursor:
 
 ; void vga_text_putc2(char ch)
 vga_text_putc2:
-        mov eax, 0
-        mov ax, [offset]
-
-        mov bx, 2
-        mul bx
+        movzx eax, word [offset]
+        shl ax, 1
 
         add eax, VIDEO
 
