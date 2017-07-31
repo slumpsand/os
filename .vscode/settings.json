@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "vga.h": "c",
-        "vga2.h": "c"
+        "vga2.h": "c",
+        "types.h": "c"
     }
 }
