@@ -12,10 +12,10 @@ void vga_text_clear2();
 void vga_text_next_line2();
 
 // put a character on the screen
-void vga_text_putc2(const char ch);
+void vga_text_putc2(char ch);
 
 // move the cursor to a specific position
-void vga_text_set_cursor2(const u8 x, const u8 y);
+void vga_text_set_cursor2(u8 x, u8 y);
 
 // set the color / background / ... byte
-void vga_text_set_color2(const u8 color);
+void vga_text_set_color2(u8 color);
