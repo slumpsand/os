@@ -1,0 +1,12 @@
+Makefile:
+	- Don't do globs for header / source files
+	- Don't use objcopy, or copy all sections
+
+drivers/vga.h:
+	- replace with vga2.h
+
+drivers/vga.asm:
+	- replace with vga2.asm
+
+drivers/vga2.asm:
+	- finish coding
