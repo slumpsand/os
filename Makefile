@@ -16,7 +16,7 @@ B := $(shell tput sgr0)
 
 LFLAGS := -e $(KERNEL_OFFSET) -Ttext $(KERNEL_OFFSET)
 AFLAGS := -f elf -gdwarf
-CFLAGS := -g3 -ffreestanding -I. -Wall -funsigned-char
+CFLAGS := -g3 -ffreestanding -I. -Wall -funsigned-char -O0
 
 HFILES := $(wildcard **/*.h)
 OFILES := boot/kernel_entry.o $(patsubst %.c,%.o,$(wildcard **/*.c)) \
