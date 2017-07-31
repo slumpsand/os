@@ -1,178 +1,198 @@
-; function symbols
-global vga_text_move_cursor
+; exported symbols
 global vga_text_init
-global vga_text_update
-global vga_text_clear
+global vga_text_putc
 global vga_text_next_line
-global vga_text_get_offset
+global vga_text_set_color
 global vga_text_set_cursor
+global vga_text_clear
+global vga_text_print_simple
+global vga_text_print
 
-; varaible symbols
-global vga_text_cursor_col
-global vga_text_cursor_row
-global vga_text_cursor_color
-global vga_text_buffer
-
-; extern symbols
-extern memcpy
+; imported symbols
 
 ; constants
 MAX_COL equ 80
 MAX_ROW equ 25
-
+TAB_SIZE equ 4
 VIDEO equ 0xB8000
 
-W_ON_B equ 0x0F00
-
 ; variables
-vga_text_cursor_col dw 0
-vga_text_cursor_row dw 0
-vga_text_cursor_color dw W_ON_B
-vga_text_buffer dd VIDEO
+offset          dw 0x0000
+color           dw 0x0F
 
-; void vga_text_move_cursor()
-vga_text_move_cursor:
-        inc word [vga_text_cursor_col]
-        cmp word [vga_text_cursor_col], MAX_COL
-        jl .end
+; void vga_text_init()
+vga_text_init:
+        ; read the higher cursor-byte
+        mov al, 0x0E
+        mov dx, 0x03D4
+        out dx, al
 
-        call vga_text_next_line
+        mov dx, 0x03D5
+        in al, dx
+        mov ah, al
 
-.end:
-        call vga_text_update
+        ; read the lower cursor-byte
+        mov al, 0x0F
+        mov dx, 0x03D4
+        out dx, al
+
+        mov dx, 0x03D5
+        in al, dx
+
+        mov [offset], ax
+
         ret
 
-; void vga_text_update()
-vga_text_update:
-        call vga_text_get_offset
+; static void _update_cursor()
+_update_cursor:
+        mov bx, [offset]
 
-        push ax
-        shr ax, 8
+        ; the higher byte
+        mov al, 0x0E
+        mov dx, 0x03D4
+        out dx, al
 
-        mov byte [0x3D4], 0x0E
-        mov byte [0x3D5], al
+        mov al, bh
+        mov dx, 0x03D5
+        out dx, al
 
-        pop ax
-        and ax, 0x00FF
+        ; the lower byte
+        mov al, 0x0F
+        mov dx, 0x03D4
+        out dx, al
 
-        mov byte [0x03D4], 0x0F
-        mov byte [0x03D5], al
+        mov al, bl
+        mov dx, 0x03D5
+        out dx, al
+
+        ret
+
+; void vga_text_next_line()
+vga_text_next_line:
+        mov ax, [offset]
+        mov bx, MAX_COL
+        div bl
+
+        movzx ax, al
+        inc ax
+        mul bx
+
+        mov [offset], ax
+        call _update_cursor
+
+        ret
+
+; void vga_text_putc(char ch)
+vga_text_putc:
+        movzx eax, word [offset]
+        shl ax, 1
+
+        add eax, VIDEO
+
+        mov bh, [color]
+        mov bl, [esp + 4]
+
+        mov [eax], bx
+
+        inc word [offset]
+        call _update_cursor
+
+        ret
+
+; void vga_text_set_color(u8 color)
+vga_text_set_color:
+        mov al, [esp + 4]
+        mov [color], al
+        ret
+
+; void vga_text_set_cursor(u8 x, u8 y)
+vga_text_set_cursor:
+        movzx ax, byte [esp + 8]
+        mov bx, MAX_COL
+        mul bx
+
+        movzx bx, byte [esp + 4]
+        add ax, bx
+
+        mov [offset], ax
+        call _update_cursor
 
         ret
 
 ; void vga_text_clear()
 vga_text_clear:
-        mov edx, MAX_ROW
+        mov ecx, (MAX_ROW - 1) * MAX_COL * 2
 
 .loop1:
-        mov ecx, MAX_COL
-
-        mov eax, MAX_COL
-        mul edx
-
-.loop2:
-        push eax
+        mov eax, VIDEO
         add eax, ecx
-        add eax, VIDEO
 
         mov word [eax], 0
+        dec ecx
+        loop .loop1
+
+        mov word [offset], 0
+        call _update_cursor
+
+        ret
+
+; void vga_text_print_simple(const char* str)
+vga_text_print_simple:
+        mov eax, [esp + 4]
+
+        cmp byte [eax], 0
+        jnz .loop1
+
+        ret
+
+.loop1:
+        push eax
+        movzx bx, byte [eax]
+
+        push bx
+        call vga_text_putc
+        add esp, 2
 
         pop eax
+        inc eax
 
-        dec ecx
-        jnc .loop2
+        cmp byte [eax], 0
+        jnz .loop1
 
-        dec edx
-        jnc .loop1
+        ret        
 
-        mov word [vga_text_cursor_col], 0
-        mov word [vga_text_cursor_row], 0
+; void vga_text_print(const char* str)
+vga_text_print:
+        mov eax, [esp + 4]
 
-        call vga_text_update
-        ret
-
-; void vga_text_next_line()
-vga_text_next_line:
-        ; set the cursor to the next line
-        mov word [vga_text_cursor_col], 0
-        inc word [vga_text_cursor_row]
-
-        ; check if it's required to scroll the screen
-        cmp word [vga_text_cursor_row], MAX_ROW
-        jl .end
-
-        ; move all rows one up, except the first one (scrolling)
-        mov ecx, VIDEO
 .loop1:
-        mov eax, ecx
-        add ecx, MAX_COL * 2
-
-        push dword MAX_COL * 2
         push eax
-        push ecx
-        call memcpy
 
-        pop ecx
-        add esp, 8
+        cmp byte [eax], 10
+        je .newline
 
-        cmp ecx, VIDEO + (MAX_ROW - 1) * MAX_COL * 2
-        jl .loop1
+        cmp byte [eax], 9
+        je .tab
 
-        ; move the cursor one up and clear the row
-        dec word [vga_text_cursor_row]
-        mov ecx, MAX_COL
-.loop2:
-        mov eax, ecx
-        add eax, VIDEO + (MAX_ROW - 1) * MAX_COL * 2
+        movzx ax, byte [eax]
+        push ax
+        call vga_text_putc
+        add esp, 2
 
-        mov word [eax], 0
-        loop .loop2
+.next:
+        pop eax
+        inc eax
 
-.end:
-        call vga_text_update
+        cmp byte [eax], 0
+        jne .loop1
 
         ret
 
-; u16 vga_text_get_offset()
-vga_text_get_offset:
-        mov ax, [vga_text_cursor_row]
-        mov bx, MAX_COL
-        mul bx
+.tab:
+        add word [offset], TAB_SIZE
+        call _update_cursor
+        jmp .next
 
-        add ax, [vga_text_cursor_col]
-        ret
-
-; void vga_text_set_cursor(u16 x, u16 y)
-vga_text_set_cursor:
-        ; set the row
-        mov ax, [esp + 8]
-        mov [vga_text_cursor_row], ax
-
-        ; set the column
-        mov cx, [esp + 4]
-        mov [vga_text_cursor_col], cx
-
-        ; calculate the offset
-        mov bx, MAX_COL
-        mul bx
-        add cx, ax
-
-        ; send the lower byte to the VGA
-        mov al, 0x0F
-        mov dx, 0x03D4
-        out dx, al
-
-        mov al, cl
-        mov dx, 0x03D5
-        out dx, al
-
-        ; send the higher byte to the VGA
-        mov al, 0x0E
-        mov dx, 0x03D4
-        out dx, al
-
-        mov al, ch
-        mov dx, 0x03D5
-        out dx, al
-
-        ret
+.newline:
+        push .next
+        jmp vga_text_next_line

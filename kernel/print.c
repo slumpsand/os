@@ -4,6 +4,7 @@
 
 #include <drivers/vga.h>
 
+/*
 void putc(const char ch) {
   const u16 offset = vga_text_get_offset();
   vga_text_buffer[offset] = vga_text_cursor_color | ch;
@@ -38,3 +39,4 @@ void println(const char* str) {
   if(vga_text_cursor_col != 0)
     vga_text_next_line();
 }
+*/

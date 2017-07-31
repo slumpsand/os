@@ -2,32 +2,26 @@
 
 #include <cpu/types.h>
 
-#define VGA_TEXT_MAX_ROW 25
-#define VGA_TEXT_MAX_COL 80
-#define VGA_TEXT_TAB_SIZE 4
+// read all the information from the VGA
+void vga_text_init();
 
-#define VGA_TEXT_WHITE_ON_BLACK 0x0F00
-#define VGA_TEXT_RED_ON_BLACK   0x0400
-
-extern u16* vga_text_buffer;
-
-extern u16 vga_text_cursor_row;
-extern u16 vga_text_cursor_col;
-extern u16 vga_text_cursor_color;
-
-// update the cursor position on the screen
-void vga_text_update();
-
-// get the offset in the vga_text_buffer
-u16 vga_text_get_offset();
-
-// move the cursor and break a line if necessary
-void vga_text_move_cursor();
-
-// move the cursor into the next line
-void vga_text_next_line();
-
-// clear the screen
+// clear the screen and move the cursor to (0, 0)
 void vga_text_clear();
 
-void vga_text_set_cursor(u16 x, u16 y);
+// create a newline
+void vga_text_next_line();
+
+// put a character on the screen
+void vga_text_putc(char ch);
+
+// move the cursor to a specific position
+void vga_text_set_cursor(u8 x, u8 y);
+
+// set the color / background / ... byte
+void vga_text_set_color(u8 color);
+
+// print a simple string (without escapes) on the screen
+void vga_text_print_simple(const char* str);
+
+// print a string (with escapes) on the screen
+void vga_text_print(const char* str);
