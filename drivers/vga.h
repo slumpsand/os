@@ -25,3 +25,7 @@ void vga_text_print_simple(const char* str);
 
 // print a string (with escapes) on the screen
 void vga_text_print(const char* str);
+
+#define print(str) 				vga_text_print_simple(str)
+#define printc(str)				vga_text_print(str)
+#define println(str)	{ vga_text_print(str); vga_text_next_line(); }
