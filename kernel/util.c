@@ -2,11 +2,14 @@
 
 #include <kernel/util.h>
 
+
 void memcpy(const u8* src, u8* dest, u32 n) {
   for (u32 i=0; i<n; i++)
     dest[i] = src[i];
 }
 
+
+/*
 void stringify_dec(i32 n, char* out) {
   const bool sign = n < 0;
   if (sign) n = -n;
@@ -37,3 +40,4 @@ void stringify_hex(i32 n, char* out) {
 
   // TODO: reverse the string
 }
+*/

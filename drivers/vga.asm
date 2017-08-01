@@ -9,6 +9,9 @@ global vga_text_print_simple
 global vga_text_print
 global vga_text_put_tab
 
+; imported symbols
+extern memcpy
+
 ; constants
 MAX_COL equ 80
 MAX_ROW equ 25
@@ -42,10 +45,52 @@ vga_text_init:
 
         ret
 
+; static void _scroll()
+_scroll:
+        mov ecx, MAX_ROW
+        mov eax, VIDEO + MAX_COL * 2
+        mov ebx, VIDEO
+
+        push dword MAX_COL * 2
+.loop1:
+        push ebx
+        push eax
+        call memcpy                     ; TODO
+        add esp, 8
+
+        add eax, MAX_COL * 2
+        add ebx, MAX_COL * 2
+        loop .loop1
+
+        ret 4
+
+; static void _clear_last_row()
+_clear_last_row:
+        mov ecx, MAX_COL
+        mov eax, VIDEO + (MAX_ROW - 1) * MAX_COL * 2
+
+.loop1:
+        mov word [eax], 0
+
+        add eax, 2
+        loop .loop1
+
+        ret
+
 ; static void _update_cursor()
 _update_cursor:
-        mov bx, [offset]
+        mov ax, [offset]
+        mov bl, MAX_COL
+        div bl
 
+        ; check if scrolling requried
+        cmp al, MAX_ROW
+        jl .update
+
+        call _scroll
+        call _clear_last_row
+.update:
+        mov bx, [offset]
         ; the higher byte
         mov al, 0x0E
         mov dx, 0x03D4
@@ -68,14 +113,17 @@ _update_cursor:
 
 ; void vga_text_next_line()
 vga_text_next_line:
+        ; get the new row
         mov ax, [offset]
         mov bx, MAX_COL
         div bl
+        inc al
 
+        ; calculate the offset
         movzx ax, al
-        inc ax
         mul bx
 
+        ; update the cursor
         mov [offset], ax
         call _update_cursor
 
