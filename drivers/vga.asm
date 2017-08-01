@@ -47,22 +47,7 @@ vga_text_init:
 
 ; static void _scroll()
 _scroll:
-        mov ecx, MAX_ROW
-        mov eax, VIDEO + MAX_COL * 2
-        mov ebx, VIDEO
-
-        push dword MAX_COL * 2
-.loop1:
-        push ebx
-        push eax
-        call memcpy                     ; TODO
-        add esp, 8
-
-        add eax, MAX_COL * 2
-        add ebx, MAX_COL * 2
-        loop .loop1
-
-        ret 4
+        ret                                                                             ; TODO: implement this
 
 ; static void _clear_last_row()
 _clear_last_row:
@@ -89,6 +74,8 @@ _update_cursor:
 
         call _scroll
         call _clear_last_row
+        mov word [offset], (MAX_ROW - 1) * MAX_COL
+
 .update:
         mov bx, [offset]
         ; the higher byte

@@ -18,5 +18,6 @@
 
         "out/**": true,
         "**/*.o": true
-    }
+    },
+    "todohighlight.include": "{**/*.asm, **/*.c, **/*.h}"
 }
