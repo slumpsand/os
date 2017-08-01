@@ -1,6 +1,7 @@
 Makefile:
 	- Don't do globs for header / source files
 	- Don't use objcopy, or copy all sections
+	- Consider using CMake
 
-drivers/vga.asm:
-	- Do actual tabs, don't just skip 4 characters
+kernel/util.asm:
+	- test if memcpy works as intendet

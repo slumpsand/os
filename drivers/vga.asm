@@ -47,7 +47,20 @@ vga_text_init:
 
 ; static void _scroll()
 _scroll:
-        ret                                                                             ; TODO: implement this
+        mov eax, VIDEO
+        mov ebx, VIDEO + MAX_COL * 2
+
+.loop1:
+        mov cx, [ebx]
+        mov [eax], cx
+
+        add eax, 2
+        add ebx, 2
+        cmp ebx, VIDEO + (MAX_ROW) * MAX_COL * 2
+        jl .loop1
+
+        ret
+
 
 ; static void _clear_last_row()
 _clear_last_row:
