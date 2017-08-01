@@ -7,13 +7,12 @@ global vga_text_set_cursor
 global vga_text_clear
 global vga_text_print_simple
 global vga_text_print
-
-; imported symbols
+global vga_text_put_tab
 
 ; constants
 MAX_COL equ 80
 MAX_ROW equ 25
-TAB_SIZE equ 4
+TAB_SIZE equ 8
 VIDEO equ 0xB8000
 
 ; variables
@@ -189,10 +188,38 @@ vga_text_print:
         ret
 
 .tab:
-        add word [offset], TAB_SIZE
-        call _update_cursor
+        call vga_text_put_tab
         jmp .next
 
 .newline:
         push .next
         jmp vga_text_next_line
+
+; void vga_text_put_tab()
+vga_text_put_tab:
+        mov bx, MAX_COL << 8 | TAB_SIZE
+
+        ; get the column / row
+        mov ax, [offset]
+        div bh
+
+        ; save the row and put the column into ax
+        push ax
+        movzx ax, ah
+
+        ; calculate the tab
+        div bl
+        inc al
+        mul bl
+        mov cx, ax
+
+        ; get the offset
+        pop ax
+        mul bh
+        add ax, cx
+        
+        ; update the cursor
+        mov [offset], ax
+        call _update_cursor
+
+        ret

@@ -3,5 +3,6 @@
 void main() {
   vga_text_init();
 
-  vga_text_print("YAY\nThis goes into the next line ... and here is\ta tab...");
+  println("1234567\t8");
+  println("next\tand yay");
 }
