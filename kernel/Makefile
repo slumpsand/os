@@ -8,12 +8,15 @@ OFILES := $(patsubst %.c,../out/$(NAME)/%.o,$(wildcard *.c)) \
 
 ../out/$(NAME).list: $(OFILES)
 	@echo "$(A)$(NAME) complete ...$(B)"
-	echo $(OFILES) > $@
+	echo $(abspath $(OFILES)) > $@
 
-../out/$(NAME)/%.o: %.c $(HEADERS)
-	@echo "$(A)building '$<' ($(NAME)) ...$(B)"
+../out/$(NAME)/:
+	mkdir -p $@
+
+../out/$(NAME)/%.o: %.c $(HEADERS) ../out/$(NAME)/
+	@echo "$(A)> building '$<' ($(NAME)) ...$(B)"
 	$(CC) $(CFLAGS) -c $< -o $@
 
-../out/$(NAME)/%.o: %.asm
-	@echo "$(A)assembling '$<' ($(NAME)) ...$(B)"
-	$(ASM) $(AFLAGS) $< -o $@
+../out/$(NAME)/%.o: %.asm ../out/$(NAME)/
+	@echo "$(A)> assembling '$<' ($(NAME)) ...$(B)"
+	$(NASM) $(AFLAGS) $< -o $@

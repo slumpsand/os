@@ -1,19 +1,23 @@
-SHELL := /bin/bash
+export SHELL := /bin/bash
 
 OFFSET := 0x200
 TARGET := i386
 
-NASM := nasm
-MAKE := make
-CC   := $(TARGET)-elf-gcc
-LD   := $(TARGET)-elf-ld
-GDB  := $(TARGET)-elf-gdb
-OBJ  := $(TARGET)-elf-objcopy
-QEMU := qemu-system-$(TARGET)
+export NASM := nasm
+export MAKE := make
+export CC   := $(TARGET)-elf-gcc
+export LD   := $(TARGET)-elf-ld
+export GDB  := $(TARGET)-elf-gdb
+export OBJ  := $(TARGET)-elf-objcopy
+export QEMU := qemu-system-$(TARGET)
 
-A := $(shell tput setaf 6 && tput bold)
-B := $(shell tput sgr0)
-HEADERS := $(wildcard **/*.h)
+export A := $(shell tput setaf 6 && tput bold)
+export B := $(shell tput sgr0)
+export HEADERS := $(abspath $(wildcard **/*.h))
+
+export CFLAGS := -I..
+export AFLAGS :=
+export LFLAGS := -e $(OFFSET) -Ttext $(OFFSET) 
 
 help:
 	@echo "Usage: make <target>"
@@ -58,13 +62,14 @@ out/%.list:
 
 out/kernel.elf: out/cpu.list out/drivers.list out/kernel.list
 	@echo "$(A)linking kernel ...$(B)"
-	$(LD) -e $(OFFSET) -Ttext $(OFFSET) -o $@ `cat $^`
+	$(LD) $(LFLAGS) -o $@ `cat $^`
 
 out/kernel.bin: out/kernel.elf
 	@echo "$(A)extracting raw binary ...$(B)"
 	$(OBJ) -O binary $< $@
 
 out/boot.bin:
+	@echo "$(A)building boot directory ...$(B)"
 	cd boot && $(MAKE) ../$@
 
 out/fill.bin: out/boot.bin out/kernel.bin
