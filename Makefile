@@ -1,80 +1,78 @@
 SHELL := /bin/bash
 
-MAKE := make
-CC   := i386-elf-gcc
-LD   := i386-elf-ld
-GDB  := i386-elf-gdb
-OBJ  := i386-elf-objcopy
-AR   := i386-elf-ar
-QEMU := qemu-system-i386
-NASM := nasm
+OFFSET := 0x200
+TARGET := i386
 
-KERNEL_OFFSET := 0x1000
+NASM := nasm
+MAKE := make
+CC   := $(TARGET)-elf-gcc
+LD   := $(TARGET)-elf-ld
+GDB  := $(TARGET)-elf-gdb
+OBJ  := $(TARGET)-elf-objcopy
+QEMU := qemu-system-$(TARGET)
 
 A := $(shell tput setaf 6 && tput bold)
 B := $(shell tput sgr0)
+HEADERS := $(wildcard **/*.h)
 
-LFLAGS := -e $(KERNEL_OFFSET) -Ttext $(KERNEL_OFFSET)
-AFLAGS := -f elf -gdwarf
-CFLAGS := -g3 -ffreestanding -I. -Wall -funsigned-char -O0
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "targets:"
+	@echo "  build     build the source"
+	@echo "  run       eventually build, and start the emulator"
+	@echo "  debug     eventually build, and start the debugger"
+	@echo ""
+	@echo "  re-build  clean, then build"
+	@echo "  re-run    clean, then run"
+	@echo "  re-debug  clean, then debug"
+	@echo ""
+	@echo "  clean     remove all output files"
+	@echo "  help      print this page"
 
-HFILES := $(wildcard **/*.h)
-OFILES := boot/kernel_entry.o $(patsubst %.c,%.o,$(wildcard **/*.c)) \
-					$(patsubst %.asm,%.o, $(wildcard cpu/*.asm)) \
-					$(patsubst %.asm,%.o, $(wildcard drivers/*.asm)) \
-					$(patsubst %.asm,%.o, $(wildcard kernel/*.asm))
-
-build: | out/ out/kernel.bin out/boot.bin out/empty.bin
-	@echo "$(A)combining binaries ...$(B)"
-	cat out/boot.bin out/kernel.bin out/empty.bin > out/os.bin
-	@echo "$(A)build completed successfully$(B)"
-
-clean:
-	@echo "$(A)cleaning up ...$(B)"
-	rm -rf out/ boot/*.o cpu/*.o drivers/*.o kernel/*.o ||:
+build: | out/ out/os.bin
+	@echo "$(A)build complete!$(B)"
 
 run: build
-	@echo "$(A)running emulator ...$(B)"
-	$(QEMU) -drive "format=raw,file=out/os.bin"
+	@echo "$(A)starting emulator (RUN) ...$(B)"
 
 debug: build
-	@echo "$(A)running emulator (DEBUG) ...$(B)"
-	$(QEMU) -s -S -drive "format=raw,file=out/os.bin" & echo $$! > out/kernel.pid
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file out/kernel.elf"
-	kill -SIGTERM "`cat out/kernel.pid`"
+	@echo "$(A)starting emulator (DEBUG) ...$(B)"
 
-rebuild: | clean build
-rebuild-run: | rebuild run
-rebuild-debug: | rebuild debug
+re-build: | clean build
+re-run:   | clean run
+re-debug: | clean debug
+
+clean:
+	@echo "$(A)cleaning everything up ...$(B)"
+	rm -rf out/
 
 out/:
+	@echo "$(A)creating output directory ...$(B)"
 	mkdir -p out/
 
-%.o: %.c $(HFILES) Makefile
-	@echo "$(A)compiling '$<' ...$(B)"
-	$(CC) $(CFLAGS) -c $< -o $@
+out/%.list:
+	$(eval NAME := $(patsubst out/%.list,%,$@))
+	@echo "$(A)building $(NAME) directory ...$(B)"
+	cd $(NAME) && $(MAKE) ../$@
 
-%.o: %.asm $(AFILES) Makefile
-	@echo "$(A)assembling '$<' ...$(B)"
-	$(NASM) $(AFLAGS) $< -o $@
-
-out/kernel.elf: $(OFILES)
+out/kernel.elf: out/cpu.list out/drivers.list out/kernel.list
 	@echo "$(A)linking kernel ...$(B)"
-	$(LD) $(LFLAGS) -o $@ $^
+	$(LD) -e $(OFFSET) -Ttext $(OFFSET) -o $@ `cat $^`
 
 out/kernel.bin: out/kernel.elf
-	@echo "$(A)extracting kernel binary ...$(B)"
+	@echo "$(A)extracting raw binary ...$(B)"
 	$(OBJ) -O binary $< $@
 
-# It will cause an error if the bootloader tries to load more sectors from
-# disk than the disk-size. Usually that would just be zeroes but QEMU can't
-# to it. Just create an empty file ...
-out/empty.bin:
-	BYTES="$$((8193 - `wc -c < out/boot.bin` - `wc -c < out/kernel.bin`))" \
-		&& dd if=/dev/zero of=out/empty.bin bs=$${BYTES} count=1
+out/boot.bin:
+	cd boot && $(MAKE) ../$@
 
-out/boot.bin: $(wildcard boot/*.asm) Makefile
-	@echo "$(A)building bootloader ...$(B)"
-	$(NASM) -I boot/ -o $@ boot/entry.asm
+out/fill.bin: out/boot.bin out/kernel.bin
+	@echo "$(A)creating fillspace ...$(B)"
+	dd if=/dev/zero of=$@ bs=$$((8193 - `cat $^ | wc -c`))
 
-.PHONY: build clean rebuild run debug
+out/os.bin: out/boot.bin out/kernel.bin out/fill.bin
+	@echo "$(A)concatenating binaries ...$(B)"
+	cat $^ > $@
+
+.PHONY: build clean out/boot.bin out/%.list
