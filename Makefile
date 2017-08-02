@@ -45,7 +45,7 @@ run: build
 debug: build
 	@echo "$(A)starting emulator (DEBUG) ...$(B)"
 	$(QEMU) -gdb tcp::$(GDB_PORT) -S -drive "format=raw,file=out/os.bin" & echo "$$!" > out/qemu.pid
-	$(GDB) -ex "target remote localhost:$(GDB_PORT)" -ex "symbol-file out/kernel.elf"
+	$(GDB) -q -ex "symbol-file out/kernel.elf" -ex "target remote localhost:$(GDB_PORT)"
 	kill -SIGTERM "`cat out/qemu.pid`"
 
 re-build: | clean build
