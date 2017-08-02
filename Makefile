@@ -1,7 +1,8 @@
 export SHELL := /bin/bash
 
-OFFSET := 0x200
-TARGET := i386
+OFFSET   := 0x1000
+TARGET   := i386
+GDB_PORT := 6001
 
 export NASM := nasm
 export MAKE := make
@@ -39,9 +40,13 @@ build: | out/ out/os.bin
 
 run: build
 	@echo "$(A)starting emulator (RUN) ...$(B)"
+	$(QEMU) -drive "format=raw,file=out/os.bin"
 
 debug: build
 	@echo "$(A)starting emulator (DEBUG) ...$(B)"
+	$(QEMU) -gdb tcp::$(GDB_PORT) -S -drive "format=raw,file=out/os.bin" & echo "$$!" > out/qemu.pid
+	$(GDB) -ex "target remote localhost:$(GDB_PORT)" -ex "symbol-file out/kernel.elf"
+	kill -SIGTERM "`cat out/qemu.pid`"
 
 re-build: | clean build
 re-run:   | clean run
@@ -80,4 +85,4 @@ out/os.bin: out/boot.bin out/kernel.bin out/fill.bin
 	@echo "$(A)concatenating binaries ...$(B)"
 	cat $^ > $@
 
-.PHONY: build clean out/boot.bin out/%.list
+.PHONY: clean run debug out/boot.bin out/%.list
