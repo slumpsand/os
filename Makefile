@@ -16,7 +16,7 @@ export B := $(shell tput sgr0)
 export HEADERS := $(abspath $(wildcard **/*.h))
 
 export CFLAGS := -I..
-export AFLAGS :=
+export AFLAGS := -f elf
 export LFLAGS := -e $(OFFSET) -Ttext $(OFFSET) 
 
 help:
@@ -74,7 +74,7 @@ out/boot.bin:
 
 out/fill.bin: out/boot.bin out/kernel.bin
 	@echo "$(A)creating fillspace ...$(B)"
-	dd if=/dev/zero of=$@ bs=$$((8193 - `cat $^ | wc -c`))
+	dd if=/dev/zero of=$@ bs=$$((8193 - `cat $^ | wc -c`)) count=1
 
 out/os.bin: out/boot.bin out/kernel.bin out/fill.bin
 	@echo "$(A)concatenating binaries ...$(B)"

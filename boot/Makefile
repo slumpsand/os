@@ -1,5 +1,3 @@
-CHECK := $(wildcard *.asm)
-
-../out/boot.bin: entry.asm $(CHECK)
+../out/boot.bin: entry.asm $(wildcard *.asm)
 	@echo "$(A)> assembling boot/entry.asm ...$(B)"
 	$(NASM) -o $@ $<

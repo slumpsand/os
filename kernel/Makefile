@@ -8,7 +8,7 @@ OFILES := $(patsubst %.c,../out/$(NAME)/%.o,$(wildcard *.c)) \
 
 ../out/$(NAME).list: $(OFILES)
 	@echo "$(A)$(NAME) complete ...$(B)"
-	echo $(abspath $(OFILES)) > $@
+	echo -n $(abspath $(OFILES)) > $@
 
 ../out/$(NAME)/:
 	mkdir -p $@
