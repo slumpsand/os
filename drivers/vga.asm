@@ -175,7 +175,6 @@ vga_text_clear:
         add eax, ecx
 
         mov word [eax], 0
-        dec ecx
         loop .loop1
 
         mov word [offset], 0
