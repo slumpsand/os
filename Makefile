@@ -60,10 +60,14 @@ out/:
 	@echo "$(A)creating output directory ...$(B)"
 	mkdir -p out/
 
+out/boot.list:
+	@echo "$(A)building boot directory ...$(B)"
+	cd boot && $(MAKE) ../$@
+
 out/%.list:
 	$(eval NAME := $(patsubst out/%.list,%,$@))
 	@echo "$(A)building $(NAME) directory ...$(B)"
-	cd $(NAME) && $(MAKE) ../$@
+	cd $(NAME) && $(MAKE) -f ../subdir.mk NAME=$(NAME) ../$@
 
 out/kernel.elf: out/boot.list out/cpu.list out/drivers.list out/kernel.list
 	@echo "$(A)linking kernel ...$(B)"

@@ -1,5 +1,3 @@
-NAME := kernel
-
 CFLAGS +=
 AFLAGS +=
 
@@ -8,7 +6,7 @@ OFILES := $(patsubst %.c,../out/$(NAME)/%.o,$(wildcard *.c)) \
 
 ../out/$(NAME).list: $(OFILES)
 	@echo "$(A)$(NAME) complete ...$(B)"
-	echo -n $(abspath $(OFILES)) > $@
+	echo -n "$(abspath $(OFILES)) " > $@
 
 ../out/$(NAME)/:
 	mkdir -p $@
