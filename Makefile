@@ -17,8 +17,8 @@ export B := $(shell tput sgr0)
 export HEADERS := $(abspath $(wildcard **/*.h))
 
 export CFLAGS := -I..
-export AFLAGS := -f elf
-export LFLAGS := -e $(OFFSET) -Ttext $(OFFSET) 
+export AFLAGS := -f elf -gdwarf
+export LFLAGS := -e $(OFFSET) -Ttext $(OFFSET)
 
 help:
 	@echo "Usage: make <target>"
