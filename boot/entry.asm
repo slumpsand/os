@@ -3,7 +3,7 @@
 
 [org 0x7C00]                                                                    ; set the file-origin to 0x7C00
 
-KERNEL_OFFSET                   equ 0x1000                                      ; offset of the kernel-binary
+KERNEL_OFFSET                   equ 0x200                                       ; offset of the kernel-binary
 VIDEO_MEMORY                    equ 0xB8000                                     ; address of the video memory
 WHITE_ON_BLACK                  equ 0x0F
 

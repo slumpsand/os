@@ -1,6 +1,6 @@
 export SHELL := /bin/bash
 
-OFFSET   := 0x1000
+OFFSET   := 0x200
 TARGET   := i386
 GDB_PORT := 6001
 
