@@ -2,7 +2,7 @@ export SHELL := /bin/bash
 
 OFFSET   := 0x200
 TARGET   := i386
-GDB_PORT := 6001
+GDB_PORT := 6001   # has to be updated in debugging.gdb
 
 export NASM := nasm
 export MAKE := make
@@ -45,7 +45,7 @@ run: build
 debug: build
 	@echo "$(A)starting emulator (DEBUG) ...$(B)"
 	$(QEMU) -gdb tcp::$(GDB_PORT) -S -drive "format=raw,file=out/os.bin" & echo "$$!" > out/qemu.pid
-	$(GDB) -q -ex "symbol-file out/kernel.elf" -ex "target remote localhost:$(GDB_PORT)"
+	$(GDB) -q -x debugging.gdb
 	kill -SIGTERM "`cat out/qemu.pid`"
 
 re-build: | clean build
