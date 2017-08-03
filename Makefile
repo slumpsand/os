@@ -65,7 +65,7 @@ out/%.list:
 	@echo "$(A)building $(NAME) directory ...$(B)"
 	cd $(NAME) && $(MAKE) ../$@
 
-out/kernel.elf: out/cpu.list out/drivers.list out/kernel.list
+out/kernel.elf: out/boot.list out/cpu.list out/drivers.list out/kernel.list
 	@echo "$(A)linking kernel ...$(B)"
 	$(LD) $(LFLAGS) -o $@ `cat $^`
 
