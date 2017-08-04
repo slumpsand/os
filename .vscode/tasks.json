@@ -1,17 +1,15 @@
 {
 	"version": "2.0.0",
+
 	"tasks": [
 		{
 			"taskName": "Build OS",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
+			"group": { "kind": "build", "isDefault": true },
 
 			"problemMatcher": [],
 
 			"type": "shell",
-			"command": "make build",
+			"command": "make re-build",
 
 			"presentation": {
 				"reveal": "always",
@@ -21,12 +19,12 @@
 
 		{
 			"taskName": "Build & Run OS in Emulator",
-			"group": "build",
+			"group": { "kind": "test", "isDefault": true },
 
 			"problemMatcher": [],
 
 			"type": "shell",
-			"command": "make run",
+			"command": "make re-run",
 
 			"presentation": {
 				"reveal": "always",
@@ -41,7 +39,7 @@
 			"problemMatcher": [],
 
 			"type": "shell",
-			"command": "make debug",
+			"command": "make re-debug",
 
 			"presentation": {
 				"reveal": "always",
