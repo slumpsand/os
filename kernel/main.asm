@@ -5,8 +5,8 @@ main:
 	call vga_text_init
 
 	push HELLO_WORLD
-	call vga_text_print_simple
+	call vga_text_print
 
 	ret
 
-HELLO_WORLD db "Hello, World! (ASM)", 0
+HELLO_WORLD db "Hello, World!", 0

@@ -13,37 +13,37 @@ global vga_text_put_tab
 extern memcpy
 
 ; constants
-MAX_COL equ 80
-MAX_ROW equ 25
-TAB_SIZE equ 8
-VIDEO equ 0xB8000
+MAX_COL         equ 80
+MAX_ROW         equ 25
+TAB_SIZE        equ 8
+VIDEO           equ 0xB8000
 
 ; variables
-offset          dw 0x0000
-color           dw 0x0F
+offset          resb 2
+row             resb 1
+col             resb 1
+color           resb 1
 
 ; void vga_text_init()
 vga_text_init:
-        ; read the higher cursor-byte
-        mov al, 0x0E
-        mov dx, 0x03D4
-        out dx, al
+        mov byte [color],  0x0F
 
-        mov dx, 0x03D5
-        in al, dx
-        mov ah, al
-
-        ; read the lower cursor-byte
-        mov al, 0x0F
-        mov dx, 0x03D4
-        out dx, al
-
-        mov dx, 0x03D5
-        in al, dx
-
-        mov [offset], ax
+        call vga_text_clear
+        call vga_text_disable_cursor
 
         ret
+
+; void vga_text_disable_cursor()
+vga_text_disable_cursor:
+        mov dx, 0x03D4
+        mov al, 0x0A
+        out dx, al
+
+        inc dx
+        mov al, 0x3F
+        out dx, al
+
+        ret 
 
 ; static void _scroll()
 _scroll:
@@ -75,59 +75,43 @@ _clear_last_row:
 
         ret
 
-; static void _update_cursor()
-_update_cursor:
+; static void _move_cursor()
+_move_cursor:
+        ; calculate the new row / column
         mov ax, [offset]
         mov bl, MAX_COL
         div bl
 
-        ; check if scrolling requried
-        cmp al, MAX_ROW
-        jl .update
+        mov [row], al
+        mov [col], ah
 
+        ; check if scrolling is required
+        cmp al, MAX_ROW
+        jge .scroll
+        ret
+
+.scroll:
         call _scroll
         call _clear_last_row
+
         mov word [offset], (MAX_ROW - 1) * MAX_COL
-
-.update:
-        mov bx, [offset]
-        ; the higher byte
-        mov al, 0x0E
-        mov dx, 0x03D4
-        out dx, al
-
-        mov al, bh
-        mov dx, 0x03D5
-        out dx, al
-
-        ; the lower byte
-        mov al, 0x0F
-        mov dx, 0x03D4
-        out dx, al
-
-        mov al, bl
-        mov dx, 0x03D5
-        out dx, al
+        mov byte [row], 24
+        mov byte [col], 0
 
         ret
+
 
 ; void vga_text_next_line()
 vga_text_next_line:
-        ; get the new row
-        mov ax, [offset]
-        mov bx, MAX_COL
-        div bl
+        ; change into the next row
+        mov al, [row]
+        mov ah, MAX_COL
         inc al
-
-        ; calculate the offset
-        movzx ax, al
-        mul bx
-
-        ; update the cursor
+        mul ah
         mov [offset], ax
-        call _update_cursor
 
-        ret
+        ; move the cursor
+        jmp _move_cursor
 
 ; void vga_text_putc(char ch)
 vga_text_putc:
@@ -140,9 +124,7 @@ vga_text_putc:
         mov bl, [esp + 4]
 
         mov [eax], bx
-
         inc word [offset]
-        call _update_cursor
 
         ret
 
@@ -154,15 +136,13 @@ vga_text_set_color:
 
 ; void vga_text_set_cursor(u8 x, u8 y)
 vga_text_set_cursor:
-        movzx ax, byte [esp + 8]
-        mov bx, MAX_COL
-        mul bx
+        mov al, byte [esp + 8]
+        mov [row], al
 
-        movzx bx, byte [esp + 4]
-        add ax, bx
+        mov bl, byte [esp + 4]
+        mov [col], al
 
-        mov [offset], ax
-        call _update_cursor
+        call _move_cursor
 
         ret
 
@@ -178,7 +158,7 @@ vga_text_clear:
         loop .loop1
 
         mov word [offset], 0
-        call _update_cursor
+        call _move_cursor
 
         ret
 
@@ -205,6 +185,7 @@ vga_text_print_simple:
         cmp byte [eax], 0
         jnz .loop1
 
+        call _move_cursor
         ret        
 
 ; void vga_text_print(const char* str)
@@ -232,6 +213,7 @@ vga_text_print:
         cmp byte [eax], 0
         jne .loop1
 
+        call _move_cursor
         ret
 
 .tab:
@@ -267,6 +249,6 @@ vga_text_put_tab:
         
         ; update the cursor
         mov [offset], ax
-        call _update_cursor
+        call _move_cursor
 
         ret
