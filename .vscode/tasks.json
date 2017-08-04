@@ -1,0 +1,52 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"taskName": "Build OS",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+
+			"problemMatcher": [],
+
+			"type": "shell",
+			"command": "make build",
+
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+
+		{
+			"taskName": "Build & Run OS in Emulator",
+			"group": "build",
+
+			"problemMatcher": [],
+
+			"type": "shell",
+			"command": "make run",
+
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+
+		{
+			"taskName": "Build & Debug OS in Emulator",
+			"group": "build",
+
+			"problemMatcher": [],
+
+			"type": "shell",
+			"command": "make debug",
+
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		}
+	]
+}
