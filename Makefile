@@ -6,7 +6,6 @@ GDB_PORT := 6001   # has to be updated in debugging.gdb
 
 export NASM := nasm
 export MAKE := make
-export CC   := $(TARGET)-elf-gcc
 export LD   := $(TARGET)-elf-ld
 export GDB  := $(TARGET)-elf-gdb
 export OBJ  := $(TARGET)-elf-objcopy
@@ -14,9 +13,7 @@ export QEMU := qemu-system-$(TARGET)
 
 export A := $(shell tput setaf 6 && tput bold)
 export B := $(shell tput sgr0)
-export HEADERS := $(abspath $(wildcard **/*.h))
 
-export CFLAGS := -I..
 export AFLAGS := -f elf -gdwarf
 export LFLAGS := -e $(OFFSET) -Ttext $(OFFSET)
 

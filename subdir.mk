@@ -1,8 +1,6 @@
-CFLAGS +=
-AFLAGS +=
+AFLAGS += -I../
 
-OFILES := $(patsubst %.c,../out/$(NAME)/%.o,$(wildcard *.c)) \
-          $(patsubst %.asm,../out/$(NAME)/%.o,$(wildcard *.asm))
+OFILES := $(patsubst %.asm,../out/$(NAME)/%.o,$(filter-out $(wildcard *_h.asm),$(wildcard *.asm)))
 
 ../out/$(NAME).list: $(OFILES)
 	@echo "$(A)$(NAME) complete ...$(B)"
@@ -10,10 +8,6 @@ OFILES := $(patsubst %.c,../out/$(NAME)/%.o,$(wildcard *.c)) \
 
 ../out/$(NAME)/:
 	mkdir -p $@
-
-../out/$(NAME)/%.o: %.c $(HEADERS) ../out/$(NAME)/
-	@echo "$(A)> building '$<' ($(NAME)) ...$(B)"
-	$(CC) $(CFLAGS) -c $< -o $@
 
 ../out/$(NAME)/%.o: %.asm ../out/$(NAME)/
 	@echo "$(A)> assembling '$<' ($(NAME)) ...$(B)"
