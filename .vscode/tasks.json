@@ -30,21 +30,6 @@
 				"reveal": "always",
 				"panel": "shared"
 			}
-		},
-
-		{
-			"taskName": "Build & Debug OS in Emulator",
-			"group": "build",
-
-			"problemMatcher": [],
-
-			"type": "shell",
-			"command": "make re-debug",
-
-			"presentation": {
-				"reveal": "always",
-				"panel": "shared"
-			}
 		}
 	]
 }

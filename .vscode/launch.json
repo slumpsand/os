@@ -4,14 +4,20 @@
 		{
 			"type": "gdb",
 			"request": "attach",
-			
+
 			"name": "Debug in Emulator",
 			"executable": "out/kernel.elf",
-
+			
 			"target": ":6001",
 			"remote": true,
 
-			"cwd": "${workspaceRoot}"
+			"cwd": "${workspaceRoot}",
+
+			"autorun": [
+				"file ./scripts/debug.sh",
+				"dir cpu/ kernel/ drivers/",
+				"run"
+			]
 		}
 	]
 }
