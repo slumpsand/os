@@ -16,10 +16,10 @@ WHITE_ON_BLACK                  equ 0x0F
 
         jmp switch_pm                                                           ; switch into 32-bit protected mode
 
-%include "print.asm"
-%include "disk.asm"
-%include "gdt.asm"
-%include "switch.asm"
+%include "boot/print.asm"
+%include "boot/disk.asm"
+%include "boot/gdt.asm"
+%include "boot/switch.asm"
 
 [bits 16]
 load_kernel:

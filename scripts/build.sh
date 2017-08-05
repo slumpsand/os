@@ -10,7 +10,7 @@ LD=i386-elf-ld
 OBJ=i386-elf-objcopy
 
 # program flags
-NASM_FLAGS=-f elf -gdwarf
+NASM_FLAGS=-f elf -gdwarf -Isrc/
 LD_FLAGS=
 OBJ_FLAGS=
 
