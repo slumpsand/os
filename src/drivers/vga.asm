@@ -1,3 +1,5 @@
+%include "include.asm"
+
 ; sub-files
 %include "drivers/vga/put.asm"
 %include "drivers/vga/helper.asm"

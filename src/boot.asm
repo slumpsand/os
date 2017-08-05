@@ -1,5 +1,3 @@
-[org 0x7C00]                                                                    ; set the file-origin to 0x7C00
-
 KERNEL_OFFSET                   equ 0x200                                       ; offset of the kernel-binary
 VIDEO_MEMORY                    equ 0xB8000                                     ; address of the video memory
 WHITE_ON_BLACK                  equ 0x0F
@@ -48,3 +46,8 @@ MSG_LOAD_KERNEL db "Loading kernel into memory", 0
 
 times 510 - ($ - $$) db 0                                                       ; add some padding + magic number
 dw 0xAA55
+
+[bits 32]
+extern main                                                                     ; notice, that this instruction will be at 0x200
+call main
+jmp $

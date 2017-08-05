@@ -5,14 +5,14 @@ set -e
 KERNEL_SECTORS=16
 
 # programs
-NASM=nasm
-LD=i386-elf-ld
-OBJ=i386-elf-objcopy
+NASM="nasm"
+LD="i386-elf-ld"
+OBJ="i386-elf-objcopy"
 
 # program flags
-NASM_FLAGS=-f elf -gdwarf -Isrc/
-LD_FLAGS=
-OBJ_FLAGS=
+NASM_FLAGS="-f elf -gdwarf -Isrc/"
+LD_FLAGS="-N -Ttext 0x7C00"
+OBJ_FLAGS=""
 
 # some computed variables
 A=$(tput setaf 6 && tput bold)
