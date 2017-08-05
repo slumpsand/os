@@ -1,6 +1,3 @@
-; My bootloader didn't work at some point (I made to many modifications at once).
-; So i went back and took cfenollosas aproach.
-
 [org 0x7C00]                                                                    ; set the file-origin to 0x7C00
 
 KERNEL_OFFSET                   equ 0x200                                       ; offset of the kernel-binary
