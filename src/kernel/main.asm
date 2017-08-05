@@ -1,3 +1,6 @@
+extern vga_init
+extern vga_print
+
 main:
 	call vga_init
 

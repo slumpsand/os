@@ -1,4 +1,5 @@
-%include "include.asm"
+; other symbols
+extern memcpy
 
 ; sub-files
 %include "drivers/vga/put.asm"
@@ -6,14 +7,14 @@
 %include "drivers/vga/print.asm"
 
 ; constants
-VGA_MAX_COL        equ 80
-VGA_MAX_ROW        equ 25
-VGA_TAB_SIZE       equ 8
-VGA_VIDEO          equ 0xB8000
+MAX_COL		equ 80
+MAX_ROW		equ 25
+TAB_SIZE	equ 8
+VIDEO		equ 0xB8000
 
 ; variables
-vga~offset		dw 0x0000
-vga~color		db 0x0F
+offset		dw 0x0000
+color		db 0x0F
 
 ; void vga_init()
 vga_init:
@@ -39,11 +40,11 @@ vga_clear:
 	push eax
 	push ecx
 
-	mov ecx, (VGA_MAX_ROW - 1) * VGA_MAX_COL * 2
+	mov ecx, (MAX_ROW - 1) * MAX_COL * 2
 
 .loop1:
 
-	mov eax, VGA_VIDEO
+	mov eax, VIDEO
 	mov eax, ecx
 
 	mov word [eax], 0
@@ -59,8 +60,8 @@ vga_clear:
 vga_color:
 	push eax
 
-	mov al, [esp + 6]
-	mov [vga~color], al
+	mov al, [esp + 5]
+	mov [color], al
 
 	pop eax
 	ret 2
@@ -70,11 +71,11 @@ vga_cursor:
 	push eax
 	push ebx
 
-	mov al, [esp + 4]
-	mov bl, VGA_MAX_COL
+	mov al, [esp + 11]
+	mov bl, MAX_COL
 	mul bl
 
-	add ax, [esp + 6]
+	add ax, [esp + 14]
 	mov [offset], ax
 
 	pop ebx

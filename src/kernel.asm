@@ -1,7 +1,5 @@
-%include "include.asm"
-
-%include "kernel/util.asm"
 global memcpy
+%include "kernel/util.asm"
 
-%include "kernel/main.asm"
 global main
+%include "kernel/main.asm"

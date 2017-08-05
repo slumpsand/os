@@ -14,7 +14,7 @@ vga_simple_print:
 	call vga_putc
 
 	inc eax
-	jmp .loop
+	jmp .loop1
 
 .end:
 	pop eax

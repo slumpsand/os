@@ -3,13 +3,13 @@ vga_putc:
 	push eax
 	push ebx
 
-	movzx eax, word [vga~offset]
+	movzx eax, word [offset]
 	shl eax, 1
 
-	add eax, VGA_VIDEO
+	add eax, VIDEO
 
 	mov bh, [color]
-	mov bl, [esp + 10]
+	mov bl, [esp + 9]
 
 	mov [eax], bx
 	inc word [offset]
@@ -24,7 +24,7 @@ vga_putt:
 	push ebx
 	push ecx
 
-	mov bx, VGA_MAX_COL << 8 | VGA_TAB_SIZE
+	mov bx, MAX_COL << 8 | TAB_SIZE
 
 	; obtain row / column
 	mov ax, [offset]
@@ -60,11 +60,11 @@ vga_putnl:
 
 	; get the current row
 	mov ax, [offset]
-	mov bl, VGA_MAX_COL
+	mov bl, MAX_COL
 	div bl
 
 	inc al
-	cmp al, VGA_MAX_ROW
+	cmp al, MAX_ROW
 	jbe .scroll
 
 	; set the new row
@@ -76,10 +76,10 @@ vga_putnl:
 	ret
 
 .scroll:
-	call _vga_scroll
-	call _vga_clear_last_row
+	call _scroll
+	call _clear_last_row
 
-	mov word [offset], (VGA_MAX_ROW - 1) * VGA_MAX_COL
+	mov word [offset], (MAX_ROW - 1) * MAX_COL
 
 	pop ebx
 	pop eax

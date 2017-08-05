@@ -1,5 +1,5 @@
 ; static void _vga_clear_last_row()
-_vga_clear_last_row:
+_clear_last_row:
 	push eax
 	push ecx
 
@@ -18,7 +18,7 @@ _vga_clear_last_row:
 	ret
 
 ; static void _vga_scroll()
-_vga_scroll:
+_scroll:
 	push eax
 	push ebx
 	push ecx
