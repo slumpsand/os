@@ -11,7 +11,7 @@ OBJ="i386-elf-objcopy"
 
 # program flags
 NASM_FLAGS="-f elf -gdwarf -Isrc/"
-LD_FLAGS="-N -Ttext 0x7C00"
+LD_FLAGS="-N -Ttext 0x7C00 -e 0x7C00"
 OBJ_FLAGS=""
 
 # some computed variables
@@ -51,7 +51,7 @@ echo "$A(06) extracting the binary ...$B"
 
 # add some padding
 echo "$A(07) adding padding ...$B"
-dd if=/dev/zero of=out/padding.bin bs=$((512 * $KERNEL_SECTORS - `wc -c < out/all.bin` + 1)) count=1
+dd if=/dev/zero of=out/padding.bin bs=$((512 * $KERNEL_SECTORS - `wc -c < out/all.bin` + 1)) count=1 2> /dev/null
 cat out/all.bin out/padding.bin > out/os.bin
 
 echo "$A---BUILD COMPLETE ---$B"

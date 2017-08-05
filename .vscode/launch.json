@@ -6,17 +6,17 @@
 			"request": "attach",
 
 			"name": "Debug in Emulator",
-			"executable": "out/kernel.elf",
+			"executable": "out/all.elf",
 			
 			"target": ":6001",
 			"remote": true,
 
 			"cwd": "${workspaceRoot}",
 
+			"preLaunchTask": "start-debug",
+
 			"autorun": [
-				"file ./scripts/debug.sh",
-				"dir cpu/ kernel/ drivers/",
-				"run"
+				"dir src/"
 			]
 		}
 	]
