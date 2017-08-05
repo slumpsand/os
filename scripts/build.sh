@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-make build
+make re-build

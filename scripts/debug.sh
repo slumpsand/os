@@ -2,8 +2,7 @@
 set -e
 
 # this script shold be executed at the root directroy level
-# the script will only print the pid of the emulator, all logs will be written
-# to out/
+# the qemu-output will be written in out/qemu.log
 
 # settings
 QEMU=qemu-system-i386

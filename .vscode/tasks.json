@@ -9,7 +9,7 @@
 			"problemMatcher": [],
 
 			"type": "shell",
-			"command": "make re-build",
+			"command": "./scripts/build.sh",
 
 			"presentation": {
 				"reveal": "always",
@@ -24,7 +24,7 @@
 			"problemMatcher": [],
 
 			"type": "shell",
-			"command": "make re-run",
+			"command": "./scripts/run.sh",
 
 			"presentation": {
 				"reveal": "always",

@@ -35,19 +35,7 @@ help:
 build: | out/ out/os.bin
 	@echo "$(A)build complete!$(B)"
 
-run: build
-	@echo "$(A)starting emulator (RUN) ...$(B)"
-	$(QEMU) -drive "format=raw,file=out/os.bin"
-
-debug: build
-	@echo "$(A)starting emulator (DEBUG) ...$(B)"
-	$(QEMU) -gdb tcp::$(GDB_PORT) -S -drive "format=raw,file=out/os.bin" & echo "$$!" > out/qemu.pid
-	$(GDB) -q -x debugging.gdb
-	kill -SIGTERM "`cat out/qemu.pid`"
-
 re-build: | clean build
-re-run:   | clean run
-re-debug: | clean debug
 
 clean:
 	@echo "$(A)cleaning everything up ...$(B)"
