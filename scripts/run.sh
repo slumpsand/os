@@ -6,12 +6,10 @@ set -e
 # settings
 QEMU=qemu-system-i386
 
-# prepare some variables
 A=`tput setaf 6 && tput bold`
 B=`tput sgr0`
 
-# build the source
 ./scripts/build.sh
 
-# run the emulator
+echo "$A(08) running the emulator (RUN) ...$B"
 "$QEMU" -drive "format=raw,file=out/os.bin"

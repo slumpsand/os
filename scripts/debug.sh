@@ -6,16 +6,23 @@ set -e
 
 # settings
 QEMU=qemu-system-i386
+GDB=i386-elf-gdb
 GDB_PORT=6001
 
-# prepare some variables
 A=`tput setaf 6 && tput bold`
 B=`tput sgr0`
 
-# build the source
 ./scripts/build.sh
 
-# start the emulator
-echo "${A}running emulator ...${B}"
+echo "$A(08) running emulator (DEBUG) ...$B"
 "$QEMU" -gdb "tcp::$GDB_PORT" -S -drive "format=raw,file=out/os.bin" > out/qemu.log 2>&1 &
-echo "${A}qemu is running at pid $! ...${B}"
+QEMU_PID="$!"
+
+echo "$A(09) starting debugger ...$B"
+"$GDB" -q \
+	-ex "symbol-file out/all.elf" \
+	-ex "dir src/" \
+	-ex "target remote localhost:$GDB_PORT"
+
+echo "$A(10) stopping the emulator ...$B"
+kill -SIGTERM "$QEMU_PID" 2> /dev/null ||:

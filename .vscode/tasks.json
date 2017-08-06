@@ -8,7 +8,7 @@
 
 			"problemMatcher": [],
 
-			"type": "shell",
+			"type": "process",
 			"command": "./scripts/build.sh",
 
 			"presentation": {
@@ -23,7 +23,7 @@
 
 			"problemMatcher": [],
 
-			"type": "shell",
+			"type": "process",
 			"command": "./scripts/run.sh",
 
 			"presentation": {
@@ -33,13 +33,18 @@
 		},
 
 		{
-			"taskName": "start-debug",
-			"group": "none",
+			"taskName": "Build & Debug OS in Emulator",
+			"group": "build",
 
 			"problemMatcher": [],
 
-			"type": "shell",
-			"command": "./scripts/debug.sh"
+			"type": "process",
+			"command": "./scripts/debug.sh",
+
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
 		}
 	]
 }
