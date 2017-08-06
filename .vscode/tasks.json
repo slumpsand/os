@@ -6,14 +6,27 @@
 			"taskName": "Build OS",
 			"group": { "kind": "build", "isDefault": true },
 
-			"problemMatcher": [],
+			"problemMatcher": {
+				"owner": "nasm",
+				"fileLocation": [ "relative", "${workspaceRoot}" ],
+
+				"pattern":[
+					{
+						"regexp": "^(.*):(\\d+): (warning|error): (.*)$",
+						"file": 1,
+						"line": 2,
+						"severity": 3,
+						"message": 4
+					}
+				]
+			},
 
 			"type": "process",
 			"command": "./scripts/build.sh",
 
 			"presentation": {
-				"reveal": "always",
-				"panel": "shared"
+				"reveal": "silent",
+				"echo": false
 			}
 		},
 
@@ -27,6 +40,7 @@
 
 			"type": "process",
 			"command": "./scripts/run.sh",
+			"promptOnClose": false,
 
 			"presentation": {
 				"reveal": "always",
@@ -44,6 +58,7 @@
 
 			"type": "process",
 			"command": "./scripts/debug.sh",
+			"promptOnClose": false,
 
 			"presentation": {
 				"reveal": "always",
