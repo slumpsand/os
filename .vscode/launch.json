@@ -5,7 +5,7 @@
 			"type": "gdb",
 			"request": "attach",
 
-			"name": "Debug in Emulator",
+			"name": "Debug",
 			"executable": "out/all.elf",
 			
 			"target": ":6001",

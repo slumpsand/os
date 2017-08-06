@@ -9,7 +9,7 @@ println:
         cmp al, 0
         je .end
 
-        int 0x10
+        int 0x10                        ; FOR SOME REASON THIS WON'T WORK
 
         inc bx
         jmp .loop
@@ -22,7 +22,7 @@ println:
         int 0x10
 
         popa
-        ret
+        ret                             ; ERROR: SOMEONE TOOK SOMETHING FROM THE STACK!
 
 print_hex:
         pusha
