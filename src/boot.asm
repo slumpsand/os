@@ -5,6 +5,7 @@ WHITE_ON_BLACK                  equ 0x0F
 boot:
         mov [BOOT_DRIVE], dl                                                    ; save the boot-drive, the BIOS will put that in here
 
+        ; THESE INSTRUCTIONS WILL BE REMOVED, WHY?
         mov bp, 0x9000                                                          ; move the stack somewhere safe
         mov sp, bp
 
